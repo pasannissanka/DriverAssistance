@@ -1,0 +1,7 @@
+Executable : /home/pasan/Android/Sdk/cmake/3.10.2.4988404/bin/ninja
+arguments : 
+-C
+/home/pasan/Projects/Android/DriverAssistance-HCI/app/.cxx/cmake/debug/arm64-v8a
+yolov4
+jvmArgs : 
+

@@ -1,0 +1,8 @@
+{
+  "ndkVersionFromDsl": "22.0.7026061",
+  "sdkFolder": "/home/pasan/Android/Sdk",
+  "sideBySideNdkFolderNames": [
+    "23.1.7779620",
+    "21.3.6528147"
+  ]
+}

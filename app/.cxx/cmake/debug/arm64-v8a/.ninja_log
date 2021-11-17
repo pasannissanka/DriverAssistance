@@ -1,0 +1,4 @@
+# ninja log v5
+1	702	1637180857	CMakeFiles/yolov4.dir/jni_interface.cpp.o	a14290fe4616cbb6
+1	883	1637180858	CMakeFiles/yolov4.dir/yolov4.cpp.o	488130c7059c8997
+883	989	1637180858	/home/pasan/Projects/Android/DriverAssistance-HCI/app/build/intermediates/cmake/debug/obj/arm64-v8a/libyolov4.so	4484df70b6e2c498

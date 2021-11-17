@@ -1,0 +1,13 @@
+[
+{
+  "directory": "/home/pasan/Projects/Android/ncnn-android-yolov4-tiny-custom/app/.cxx/cmake/release/arm64-v8a",
+  "command": "/home/pasan/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --target=aarch64-none-linux-android24 --gcc-toolchain=/home/pasan/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/linux-x86_64 --sysroot=/home/pasan/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/linux-x86_64/sysroot  -Dyolov4_EXPORTS -I/home/pasan/Projects/Android/ncnn-android-yolov4-tiny-custom/app/src/main/cpp/ncnnvulkan/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -fopenmp -O2 -DNDEBUG  -fPIC   -o CMakeFiles/yolov4.dir/jni_interface.cpp.o -c /home/pasan/Projects/Android/ncnn-android-yolov4-tiny-custom/app/src/main/cpp/jni_interface.cpp",
+  "file": "/home/pasan/Projects/Android/ncnn-android-yolov4-tiny-custom/app/src/main/cpp/jni_interface.cpp"
+},
+
+{
+  "directory": "/home/pasan/Projects/Android/ncnn-android-yolov4-tiny-custom/app/.cxx/cmake/release/arm64-v8a",
+  "command": "/home/pasan/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --target=aarch64-none-linux-android24 --gcc-toolchain=/home/pasan/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/linux-x86_64 --sysroot=/home/pasan/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/linux-x86_64/sysroot  -Dyolov4_EXPORTS -I/home/pasan/Projects/Android/ncnn-android-yolov4-tiny-custom/app/src/main/cpp/ncnnvulkan/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -fopenmp -O2 -DNDEBUG  -fPIC   -o CMakeFiles/yolov4.dir/yolov4.cpp.o -c /home/pasan/Projects/Android/ncnn-android-yolov4-tiny-custom/app/src/main/cpp/yolov4.cpp",
+  "file": "/home/pasan/Projects/Android/ncnn-android-yolov4-tiny-custom/app/src/main/cpp/yolov4.cpp"
+}
+]
