@@ -5,7 +5,7 @@ android {
     buildToolsVersion "29.0.3"
     defaultConfig {
         resConfigs('zh-rCN')
-        applicationId 'top.sun1999.yolov4tiny'
+        applicationId 'com.example.driverassistance'
         minSdkVersion 24
         targetSdkVersion 29
         versionCode 1

@@ -1,2 +1,3 @@
 ninja: Entering directory `/home/pasan/Projects/Android/DriverAssistance-HCI/app/.cxx/cmake/debug/arm64-v8a'
-ninja: no work to do.
+[1/2] Building CXX object CMakeFiles/yolov4.dir/jni_interface.cpp.o
+[2/2] Linking CXX shared library /home/pasan/Projects/Android/DriverAssistance-HCI/app/build/intermediates/cmake/debug/obj/arm64-v8a/libyolov4.so

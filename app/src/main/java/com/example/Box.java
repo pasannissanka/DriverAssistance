@@ -1,9 +1,7 @@
-package top.sun1999;
+package com.example;
 
 import android.graphics.Color;
 import android.graphics.RectF;
-
-import java.util.Random;
 
 public class Box {
     public float x0, y0, x1, y1;

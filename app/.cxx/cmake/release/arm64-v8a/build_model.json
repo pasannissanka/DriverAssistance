@@ -5,9 +5,9 @@
     "environmentVariables": []
   },
   "cmake": {
-    "cmakeArtifactsBaseFolder": "/home/pasan/Projects/Android/ncnn-android-yolov4-tiny-custom/app/.cxx/cmake/release/arm64-v8a",
-    "cmakeServerLogFile": "/home/pasan/Projects/Android/ncnn-android-yolov4-tiny-custom/app/.cxx/cmake/release/arm64-v8a/cmake_server_log.txt",
-    "cmakeWrappingBaseFolder": "/home/pasan/Projects/Android/ncnn-android-yolov4-tiny-custom/app/.cxx/cxx/release/arm64-v8a",
+    "cmakeArtifactsBaseFolder": "/home/pasan/Projects/Android/DriverAssistance-HCI/app/.cxx/cmake/release/arm64-v8a",
+    "cmakeServerLogFile": "/home/pasan/Projects/Android/DriverAssistance-HCI/app/.cxx/cmake/release/arm64-v8a/cmake_server_log.txt",
+    "cmakeWrappingBaseFolder": "/home/pasan/Projects/Android/DriverAssistance-HCI/app/.cxx/cxx/release/arm64-v8a",
     "effectiveConfiguration": {
       "name": "traditional-android-studio-cmake-environment",
       "description": "Composite reified CMakeSettings configuration",
@@ -15,13 +15,13 @@
       "inheritEnvironments": [
         "ndk"
       ],
-      "buildRoot": "/home/pasan/Projects/Android/ncnn-android-yolov4-tiny-custom/app/.cxx/cmake/release/arm64-v8a",
+      "buildRoot": "/home/pasan/Projects/Android/DriverAssistance-HCI/app/.cxx/cmake/release/arm64-v8a",
       "cmakeToolchain": "/home/pasan/Android/Sdk/ndk/22.0.7026061/build/cmake/android.toolchain.cmake",
       "cmakeExecutable": "/home/pasan/Android/Sdk/cmake/3.10.2.4988404/bin/cmake",
       "variables": [
         {
           "name": "CMAKE_FIND_ROOT_PATH",
-          "value": "/home/pasan/Projects/Android/ncnn-android-yolov4-tiny-custom/app/.cxx/cmake/release/prefab/arm64-v8a/prefab"
+          "value": "/home/pasan/Projects/Android/DriverAssistance-HCI/app/.cxx/cmake/release/prefab/arm64-v8a/prefab"
         },
         {
           "name": "CMAKE_BUILD_TYPE",
@@ -57,7 +57,7 @@
         },
         {
           "name": "CMAKE_LIBRARY_OUTPUT_DIRECTORY",
-          "value": "/home/pasan/Projects/Android/ncnn-android-yolov4-tiny-custom/app/build/intermediates/cmake/release/obj/arm64-v8a"
+          "value": "/home/pasan/Projects/Android/DriverAssistance-HCI/app/build/intermediates/cmake/release/obj/arm64-v8a"
         },
         {
           "name": "CMAKE_MAKE_PROGRAM",
@@ -74,14 +74,14 @@
       ]
     }
   },
-  "cxxBuildFolder": "/home/pasan/Projects/Android/ncnn-android-yolov4-tiny-custom/app/.cxx/cmake/release/arm64-v8a",
+  "cxxBuildFolder": "/home/pasan/Projects/Android/DriverAssistance-HCI/app/.cxx/cmake/release/arm64-v8a",
   "info": {
     "abi": "ARM64_V8A",
     "bitness": 64,
     "deprecated": false,
     "default": true
   },
-  "originalCxxBuildFolder": "/home/pasan/Projects/Android/ncnn-android-yolov4-tiny-custom/app/.cxx/cmake/release/arm64-v8a",
+  "originalCxxBuildFolder": "/home/pasan/Projects/Android/DriverAssistance-HCI/app/.cxx/cmake/release/arm64-v8a",
   "variant": {
     "buildSystemArgumentList": [],
     "buildTargetSet": [],
@@ -99,12 +99,12 @@
         "ninjaExe": "/home/pasan/Android/Sdk/cmake/3.10.2.4988404/bin/ninja"
       },
       "cmakeToolchainFile": "/home/pasan/Android/Sdk/ndk/22.0.7026061/build/cmake/android.toolchain.cmake",
-      "cxxFolder": "/home/pasan/Projects/Android/ncnn-android-yolov4-tiny-custom/app/.cxx",
+      "cxxFolder": "/home/pasan/Projects/Android/DriverAssistance-HCI/app/.cxx",
       "gradleModulePathName": ":app",
-      "intermediatesFolder": "/home/pasan/Projects/Android/ncnn-android-yolov4-tiny-custom/app/build/intermediates",
-      "makeFile": "/home/pasan/Projects/Android/ncnn-android-yolov4-tiny-custom/app/src/main/cpp/CMakeLists.txt",
-      "moduleBuildFile": "/home/pasan/Projects/Android/ncnn-android-yolov4-tiny-custom/app/build.gradle",
-      "moduleRootFolder": "/home/pasan/Projects/Android/ncnn-android-yolov4-tiny-custom/app",
+      "intermediatesFolder": "/home/pasan/Projects/Android/DriverAssistance-HCI/app/build/intermediates",
+      "makeFile": "/home/pasan/Projects/Android/DriverAssistance-HCI/app/src/main/cpp/CMakeLists.txt",
+      "moduleBuildFile": "/home/pasan/Projects/Android/DriverAssistance-HCI/app/build.gradle",
+      "moduleRootFolder": "/home/pasan/Projects/Android/DriverAssistance-HCI/app",
       "ndkDefaultAbiList": [
         "ARMEABI_V7A",
         "ARM64_V8A",
@@ -169,12 +169,12 @@
       "ndkDefaultStl": "LIBCXX_STATIC",
       "ndkVersion": "22.0.7026061",
       "project": {
-        "compilerSettingsCacheFolder": "/home/pasan/Projects/Android/ncnn-android-yolov4-tiny-custom/.cxx",
-        "cxxFolder": "/home/pasan/Projects/Android/ncnn-android-yolov4-tiny-custom/.cxx",
+        "compilerSettingsCacheFolder": "/home/pasan/Projects/Android/DriverAssistance-HCI/.cxx",
+        "cxxFolder": "/home/pasan/Projects/Android/DriverAssistance-HCI/.cxx",
         "isBuildOnlyTargetAbiEnabled": true,
         "isCmakeBuildCohabitationEnabled": false,
         "isNativeCompilerSettingsCacheEnabled": false,
-        "rootBuildGradleFolder": "/home/pasan/Projects/Android/ncnn-android-yolov4-tiny-custom",
+        "rootBuildGradleFolder": "/home/pasan/Projects/Android/DriverAssistance-HCI",
         "sdkFolder": "/home/pasan/Android/Sdk",
         "isPrefabEnabled": false
       },
@@ -191,13 +191,13 @@
         "SYSTEM": {}
       }
     },
-    "objFolder": "/home/pasan/Projects/Android/ncnn-android-yolov4-tiny-custom/app/build/intermediates/cmake/release/obj",
+    "objFolder": "/home/pasan/Projects/Android/DriverAssistance-HCI/app/build/intermediates/cmake/release/obj",
     "variantName": "release",
     "validAbiList": [
       "ARM64_V8A"
     ],
-    "prefabDirectory": "/home/pasan/Projects/Android/ncnn-android-yolov4-tiny-custom/app/.cxx/cmake/release/prefab",
+    "prefabDirectory": "/home/pasan/Projects/Android/DriverAssistance-HCI/app/.cxx/cmake/release/prefab",
     "prefabPackageDirectoryList": []
   },
-  "prefabFolder": "/home/pasan/Projects/Android/ncnn-android-yolov4-tiny-custom/app/.cxx/cmake/release/prefab/arm64-v8a"
+  "prefabFolder": "/home/pasan/Projects/Android/DriverAssistance-HCI/app/.cxx/cmake/release/prefab/arm64-v8a"
 }

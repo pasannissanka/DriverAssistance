@@ -42,7 +42,7 @@ rule CXX_SHARED_LIBRARY_LINKER__yolov4
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = /home/pasan/Android/Sdk/cmake/3.10.2.4988404/bin/cmake -H/home/pasan/Projects/Android/ncnn-android-yolov4-tiny-custom/app/src/main/cpp -B/home/pasan/Projects/Android/ncnn-android-yolov4-tiny-custom/app/.cxx/cmake/release/arm64-v8a
+  command = /home/pasan/Android/Sdk/cmake/3.10.2.4988404/bin/cmake -H/home/pasan/Projects/Android/DriverAssistance-HCI/app/src/main/cpp -B/home/pasan/Projects/Android/DriverAssistance-HCI/app/.cxx/cmake/release/arm64-v8a
   description = Re-running CMake...
   generator = 1
 

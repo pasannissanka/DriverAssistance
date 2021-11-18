@@ -18,7 +18,7 @@ JNIEXPORT void JNI_OnUnload(JavaVM *vm, void *reserved) {
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_top_sun1999_YOLOv4_init(JNIEnv *env, jclass, jobject assetManager) {
+Java_com_example_YOLOv4_init(JNIEnv *env, jclass, jobject assetManager) {
     if (yolov4::detector == nullptr) {
         AAssetManager *mgr = AAssetManager_fromJava(env, assetManager);
         yolov4::detector = new yolov4(mgr, "yolov4-tiny_opt.param", "yolov4-tiny_opt.bin", false);
@@ -26,11 +26,11 @@ Java_top_sun1999_YOLOv4_init(JNIEnv *env, jclass, jobject assetManager) {
 }
 
 extern "C" JNIEXPORT jobjectArray JNICALL
-Java_top_sun1999_YOLOv4_detect(JNIEnv *env, jclass, jobject image, jdouble threshold,
+Java_com_example_YOLOv4_detect(JNIEnv *env, jclass, jobject image, jdouble threshold,
                                jdouble nms_threshold) {
     auto result = yolov4::detector->detect(env, image, threshold, nms_threshold);
 
-    auto box_cls = env->FindClass("top/sun1999/Box");
+    auto box_cls = env->FindClass("com/example/Box");
     auto cid = env->GetMethodID(box_cls, "<init>", "(FFFFIF)V");
     jobjectArray ret = env->NewObjectArray(result.size(), box_cls, nullptr);
     int i = 0;
