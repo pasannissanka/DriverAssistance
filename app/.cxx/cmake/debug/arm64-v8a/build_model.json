@@ -5,9 +5,9 @@
     "environmentVariables": []
   },
   "cmake": {
-    "cmakeArtifactsBaseFolder": "/home/pasan/Projects/Android/DriverAssistance-HCI/app/.cxx/cmake/debug/arm64-v8a",
-    "cmakeServerLogFile": "/home/pasan/Projects/Android/DriverAssistance-HCI/app/.cxx/cmake/debug/arm64-v8a/cmake_server_log.txt",
-    "cmakeWrappingBaseFolder": "/home/pasan/Projects/Android/DriverAssistance-HCI/app/.cxx/cxx/debug/arm64-v8a",
+    "cmakeArtifactsBaseFolder": "C:\\Users\\Nihara\\Desktop\\hci project\\DriverAssistance\\app\\.cxx\\cmake\\debug\\arm64-v8a",
+    "cmakeServerLogFile": "C:\\Users\\Nihara\\Desktop\\hci project\\DriverAssistance\\app\\.cxx\\cmake\\debug\\arm64-v8a\\cmake_server_log.txt",
+    "cmakeWrappingBaseFolder": "C:\\Users\\Nihara\\Desktop\\hci project\\DriverAssistance\\app\\.cxx\\cxx\\debug\\arm64-v8a",
     "effectiveConfiguration": {
       "name": "traditional-android-studio-cmake-environment",
       "description": "Composite reified CMakeSettings configuration",
@@ -15,13 +15,13 @@
       "inheritEnvironments": [
         "ndk"
       ],
-      "buildRoot": "/home/pasan/Projects/Android/DriverAssistance-HCI/app/.cxx/cmake/debug/arm64-v8a",
-      "cmakeToolchain": "/home/pasan/Android/Sdk/ndk/22.0.7026061/build/cmake/android.toolchain.cmake",
-      "cmakeExecutable": "/home/pasan/Android/Sdk/cmake/3.10.2.4988404/bin/cmake",
+      "buildRoot": "C:\\Users\\Nihara\\Desktop\\hci project\\DriverAssistance\\app\\.cxx\\cmake\\debug\\arm64-v8a",
+      "cmakeToolchain": "C:\\Users\\Nihara\\AppData\\Local\\Android\\Sdk\\ndk\\22.0.7026061\\build\\cmake\\android.toolchain.cmake",
+      "cmakeExecutable": "C:\\Users\\Nihara\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\cmake.exe",
       "variables": [
         {
           "name": "CMAKE_FIND_ROOT_PATH",
-          "value": "/home/pasan/Projects/Android/DriverAssistance-HCI/app/.cxx/cmake/debug/prefab/arm64-v8a/prefab"
+          "value": "C:\\Users\\Nihara\\Desktop\\hci project\\DriverAssistance\\app\\.cxx\\cmake\\debug\\prefab\\arm64-v8a\\prefab"
         },
         {
           "name": "CMAKE_BUILD_TYPE",
@@ -29,7 +29,7 @@
         },
         {
           "name": "CMAKE_TOOLCHAIN_FILE",
-          "value": "/home/pasan/Android/Sdk/ndk/22.0.7026061/build/cmake/android.toolchain.cmake"
+          "value": "C:\\Users\\Nihara\\AppData\\Local\\Android\\Sdk\\ndk\\22.0.7026061\\build\\cmake\\android.toolchain.cmake"
         },
         {
           "name": "ANDROID_ABI",
@@ -37,7 +37,7 @@
         },
         {
           "name": "ANDROID_NDK",
-          "value": "/home/pasan/Android/Sdk/ndk/22.0.7026061"
+          "value": "C:\\Users\\Nihara\\AppData\\Local\\Android\\Sdk\\ndk\\22.0.7026061"
         },
         {
           "name": "ANDROID_PLATFORM",
@@ -49,7 +49,7 @@
         },
         {
           "name": "CMAKE_ANDROID_NDK",
-          "value": "/home/pasan/Android/Sdk/ndk/22.0.7026061"
+          "value": "C:\\Users\\Nihara\\AppData\\Local\\Android\\Sdk\\ndk\\22.0.7026061"
         },
         {
           "name": "CMAKE_EXPORT_COMPILE_COMMANDS",
@@ -57,11 +57,11 @@
         },
         {
           "name": "CMAKE_LIBRARY_OUTPUT_DIRECTORY",
-          "value": "/home/pasan/Projects/Android/DriverAssistance-HCI/app/build/intermediates/cmake/debug/obj/arm64-v8a"
+          "value": "C:\\Users\\Nihara\\Desktop\\hci project\\DriverAssistance\\app\\build\\intermediates\\cmake\\debug\\obj\\arm64-v8a"
         },
         {
           "name": "CMAKE_MAKE_PROGRAM",
-          "value": "/home/pasan/Android/Sdk/cmake/3.10.2.4988404/bin/ninja"
+          "value": "C:\\Users\\Nihara\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe"
         },
         {
           "name": "CMAKE_SYSTEM_NAME",
@@ -74,14 +74,14 @@
       ]
     }
   },
-  "cxxBuildFolder": "/home/pasan/Projects/Android/DriverAssistance-HCI/app/.cxx/cmake/debug/arm64-v8a",
+  "cxxBuildFolder": "C:\\Users\\Nihara\\Desktop\\hci project\\DriverAssistance\\app\\.cxx\\cmake\\debug\\arm64-v8a",
   "info": {
     "abi": "ARM64_V8A",
     "bitness": 64,
     "deprecated": false,
     "default": true
   },
-  "originalCxxBuildFolder": "/home/pasan/Projects/Android/DriverAssistance-HCI/app/.cxx/cmake/debug/arm64-v8a",
+  "originalCxxBuildFolder": "C:\\Users\\Nihara\\Desktop\\hci project\\DriverAssistance\\app\\.cxx\\cmake\\debug\\arm64-v8a",
   "variant": {
     "buildSystemArgumentList": [],
     "buildTargetSet": [],
@@ -94,24 +94,24 @@
     "module": {
       "buildSystem": "CMAKE",
       "cmake": {
-        "cmakeExe": "/home/pasan/Android/Sdk/cmake/3.10.2.4988404/bin/cmake",
+        "cmakeExe": "C:\\Users\\Nihara\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\cmake.exe",
         "minimumCmakeVersion": "3.10.2",
-        "ninjaExe": "/home/pasan/Android/Sdk/cmake/3.10.2.4988404/bin/ninja"
+        "ninjaExe": "C:\\Users\\Nihara\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe"
       },
-      "cmakeToolchainFile": "/home/pasan/Android/Sdk/ndk/22.0.7026061/build/cmake/android.toolchain.cmake",
-      "cxxFolder": "/home/pasan/Projects/Android/DriverAssistance-HCI/app/.cxx",
+      "cmakeToolchainFile": "C:\\Users\\Nihara\\AppData\\Local\\Android\\Sdk\\ndk\\22.0.7026061\\build\\cmake\\android.toolchain.cmake",
+      "cxxFolder": "C:\\Users\\Nihara\\Desktop\\hci project\\DriverAssistance\\app\\.cxx",
       "gradleModulePathName": ":app",
-      "intermediatesFolder": "/home/pasan/Projects/Android/DriverAssistance-HCI/app/build/intermediates",
-      "makeFile": "/home/pasan/Projects/Android/DriverAssistance-HCI/app/src/main/cpp/CMakeLists.txt",
-      "moduleBuildFile": "/home/pasan/Projects/Android/DriverAssistance-HCI/app/build.gradle",
-      "moduleRootFolder": "/home/pasan/Projects/Android/DriverAssistance-HCI/app",
+      "intermediatesFolder": "C:\\Users\\Nihara\\Desktop\\hci project\\DriverAssistance\\app\\build\\intermediates",
+      "makeFile": "C:\\Users\\Nihara\\Desktop\\hci project\\DriverAssistance\\app\\src\\main\\cpp\\CMakeLists.txt",
+      "moduleBuildFile": "C:\\Users\\Nihara\\Desktop\\hci project\\DriverAssistance\\app\\build.gradle",
+      "moduleRootFolder": "C:\\Users\\Nihara\\Desktop\\hci project\\DriverAssistance\\app",
       "ndkDefaultAbiList": [
         "ARMEABI_V7A",
         "ARM64_V8A",
         "X86",
         "X86_64"
       ],
-      "ndkFolder": "/home/pasan/Android/Sdk/ndk/22.0.7026061",
+      "ndkFolder": "C:\\Users\\Nihara\\AppData\\Local\\Android\\Sdk\\ndk\\22.0.7026061",
       "ndkMetaAbiList": [
         {
           "abi": "ARMEABI_V7A",
@@ -169,36 +169,35 @@
       "ndkDefaultStl": "LIBCXX_STATIC",
       "ndkVersion": "22.0.7026061",
       "project": {
-        "compilerSettingsCacheFolder": "/home/pasan/Projects/Android/DriverAssistance-HCI/.cxx",
-        "cxxFolder": "/home/pasan/Projects/Android/DriverAssistance-HCI/.cxx",
-        "ideBuildTargetAbi": "arm64-v8a,armeabi-v7a,armeabi",
+        "compilerSettingsCacheFolder": "C:\\Users\\Nihara\\Desktop\\hci project\\DriverAssistance\\.cxx",
+        "cxxFolder": "C:\\Users\\Nihara\\Desktop\\hci project\\DriverAssistance\\.cxx",
         "isBuildOnlyTargetAbiEnabled": true,
         "isCmakeBuildCohabitationEnabled": false,
         "isNativeCompilerSettingsCacheEnabled": false,
-        "rootBuildGradleFolder": "/home/pasan/Projects/Android/DriverAssistance-HCI",
-        "sdkFolder": "/home/pasan/Android/Sdk",
+        "rootBuildGradleFolder": "C:\\Users\\Nihara\\Desktop\\hci project\\DriverAssistance",
+        "sdkFolder": "C:\\Users\\Nihara\\AppData\\Local\\Android\\Sdk",
         "isPrefabEnabled": false
       },
       "splitsAbiFilterSet": [],
       "stlSharedObjectMap": {
         "LIBCXX_SHARED": {
-          "ARMEABI_V7A": "/home/pasan/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/arm-linux-androideabi/libc++_shared.so",
-          "ARM64_V8A": "/home/pasan/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/aarch64-linux-android/libc++_shared.so",
-          "X86": "/home/pasan/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/i686-linux-android/libc++_shared.so",
-          "X86_64": "/home/pasan/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/x86_64-linux-android/libc++_shared.so"
+          "ARMEABI_V7A": "C:\\Users\\Nihara\\AppData\\Local\\Android\\Sdk\\ndk\\22.0.7026061\\toolchains\\llvm\\prebuilt\\windows-x86_64\\sysroot\\usr\\lib\\arm-linux-androideabi\\libc++_shared.so",
+          "ARM64_V8A": "C:\\Users\\Nihara\\AppData\\Local\\Android\\Sdk\\ndk\\22.0.7026061\\toolchains\\llvm\\prebuilt\\windows-x86_64\\sysroot\\usr\\lib\\aarch64-linux-android\\libc++_shared.so",
+          "X86": "C:\\Users\\Nihara\\AppData\\Local\\Android\\Sdk\\ndk\\22.0.7026061\\toolchains\\llvm\\prebuilt\\windows-x86_64\\sysroot\\usr\\lib\\i686-linux-android\\libc++_shared.so",
+          "X86_64": "C:\\Users\\Nihara\\AppData\\Local\\Android\\Sdk\\ndk\\22.0.7026061\\toolchains\\llvm\\prebuilt\\windows-x86_64\\sysroot\\usr\\lib\\x86_64-linux-android\\libc++_shared.so"
         },
         "LIBCXX_STATIC": {},
         "NONE": {},
         "SYSTEM": {}
       }
     },
-    "objFolder": "/home/pasan/Projects/Android/DriverAssistance-HCI/app/build/intermediates/cmake/debug/obj",
+    "objFolder": "C:\\Users\\Nihara\\Desktop\\hci project\\DriverAssistance\\app\\build\\intermediates\\cmake\\debug\\obj",
     "variantName": "debug",
     "validAbiList": [
       "ARM64_V8A"
     ],
-    "prefabDirectory": "/home/pasan/Projects/Android/DriverAssistance-HCI/app/.cxx/cmake/debug/prefab",
+    "prefabDirectory": "C:\\Users\\Nihara\\Desktop\\hci project\\DriverAssistance\\app\\.cxx\\cmake\\debug\\prefab",
     "prefabPackageDirectoryList": []
   },
-  "prefabFolder": "/home/pasan/Projects/Android/DriverAssistance-HCI/app/.cxx/cmake/debug/prefab/arm64-v8a"
+  "prefabFolder": "C:\\Users\\Nihara\\Desktop\\hci project\\DriverAssistance\\app\\.cxx\\cmake\\debug\\prefab\\arm64-v8a"
 }

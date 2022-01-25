@@ -1,7 +1,4 @@
 # ninja log v5
-0	750	1637228788	CMakeFiles/yolov4.dir/jni_interface.cpp.o	a14290fe4616cbb6
-0	951	1637228789	CMakeFiles/yolov4.dir/yolov4.cpp.o	488130c7059c8997
-951	1062	1637228789	/home/pasan/Projects/Android/DriverAssistance-HCI/app/build/intermediates/cmake/debug/obj/arm64-v8a/libyolov4.so	4484df70b6e2c498
-1	736	1637229249	CMakeFiles/yolov4.dir/jni_interface.cpp.o	a14290fe4616cbb6
-1	925	1637229250	CMakeFiles/yolov4.dir/yolov4.cpp.o	488130c7059c8997
-925	1096	1637229250	/home/pasan/Projects/Android/DriverAssistance-HCI/app/build/intermediates/cmake/debug/obj/arm64-v8a/libyolov4.so	4484df70b6e2c498
+0	7300	659196398	CMakeFiles/yolov4.dir/jni_interface.cpp.o	c4ae99e9d90ae142
+4	7552	659196398	CMakeFiles/yolov4.dir/yolov4.cpp.o	322d7b95e09f3988
+7552	10138	659196401	libyolov4.so	c4f3e2f7396f097

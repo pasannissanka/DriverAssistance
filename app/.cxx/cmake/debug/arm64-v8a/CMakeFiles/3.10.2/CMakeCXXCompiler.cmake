@@ -1,4 +1,4 @@
-set(CMAKE_CXX_COMPILER "/home/pasan/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++")
+set(CMAKE_CXX_COMPILER "C:/Users/Nihara/AppData/Local/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe")
 set(CMAKE_CXX_COMPILER_ARG1 "")
 set(CMAKE_CXX_COMPILER_ID "Clang")
 set(CMAKE_CXX_COMPILER_VERSION "11.0.5")
@@ -11,22 +11,22 @@ set(CMAKE_CXX11_COMPILE_FEATURES "cxx_std_11;cxx_alias_templates;cxx_alignas;cxx
 set(CMAKE_CXX14_COMPILE_FEATURES "cxx_std_14;cxx_aggregate_default_initializers;cxx_attribute_deprecated;cxx_binary_literals;cxx_contextual_conversions;cxx_decltype_auto;cxx_digit_separators;cxx_generic_lambdas;cxx_lambda_init_captures;cxx_relaxed_constexpr;cxx_return_type_deduction;cxx_variable_templates")
 set(CMAKE_CXX17_COMPILE_FEATURES "cxx_std_17")
 
-set(CMAKE_CXX_PLATFORM_ID "Linux")
+set(CMAKE_CXX_PLATFORM_ID "MinGW")
 set(CMAKE_CXX_SIMULATE_ID "")
 set(CMAKE_CXX_SIMULATE_VERSION "")
 
 
 
-set(CMAKE_AR "/home/pasan/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar")
+set(CMAKE_AR "C:/Users/Nihara/AppData/Local/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/windows-x86_64/bin/llvm-ar.exe")
 set(CMAKE_CXX_COMPILER_AR "CMAKE_CXX_COMPILER_AR-NOTFOUND")
-set(CMAKE_RANLIB "/home/pasan/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ranlib")
+set(CMAKE_RANLIB "C:/Users/Nihara/AppData/Local/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/windows-x86_64/bin/llvm-ranlib.exe")
 set(CMAKE_CXX_COMPILER_RANLIB "CMAKE_CXX_COMPILER_RANLIB-NOTFOUND")
 set(CMAKE_LINKER "CMAKE_LINKER-NOTFOUND")
 set(CMAKE_COMPILER_IS_GNUCXX )
 set(CMAKE_CXX_COMPILER_LOADED 1)
 set(CMAKE_CXX_COMPILER_WORKS TRUE)
 set(CMAKE_CXX_ABI_COMPILED TRUE)
-set(CMAKE_COMPILER_IS_MINGW )
+set(CMAKE_COMPILER_IS_MINGW 1)
 set(CMAKE_COMPILER_IS_CYGWIN )
 if(CMAKE_COMPILER_IS_CYGWIN)
   set(CYGWIN 1)
@@ -71,5 +71,5 @@ endif()
 
 
 set(CMAKE_CXX_IMPLICIT_LINK_LIBRARIES "c++;m;gcc;dl;c;gcc;dl")
-set(CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES "/home/pasan/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/linux-x86_64/lib64/clang/11.0.5/lib/linux/aarch64;/home/pasan/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/linux-x86_64/lib/gcc/aarch64-linux-android/4.9.x;/home/pasan/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/linux-x86_64/aarch64-linux-android/lib64;/home/pasan/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/aarch64-linux-android/24;/home/pasan/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/aarch64-linux-android;/home/pasan/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/linux-x86_64/aarch64-linux-android/lib;/home/pasan/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib")
+set(CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES "C:/Users/Nihara/AppData/Local/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/windows-x86_64/lib64/clang/11.0.5/lib/linux/aarch64;C:/Users/Nihara/AppData/Local/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/windows-x86_64/lib/gcc/aarch64-linux-android/4.9.x;C:/Users/Nihara/AppData/Local/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/windows-x86_64/aarch64-linux-android/lib64;C:/Users/Nihara/AppData/Local/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/lib/aarch64-linux-android/24;C:/Users/Nihara/AppData/Local/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/lib/aarch64-linux-android;C:/Users/Nihara/AppData/Local/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/windows-x86_64/aarch64-linux-android/lib;C:/Users/Nihara/AppData/Local/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/lib")
 set(CMAKE_CXX_IMPLICIT_LINK_FRAMEWORK_DIRECTORIES "")
