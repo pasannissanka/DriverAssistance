@@ -34,21 +34,20 @@ public:
 
     std::vector<BoxInfo> detect(JNIEnv *env, jobject image, float threshold, float nms_threshold);
 
-    std::vector<std::string> labels{"bus prority lane",
-    "children crossing",
-    "hospital",
-    "level crossing with gates",
-    "no honking",
-    "no left turn",
-    "no right turn",
-    "no u turn",
-    "pedestrian crossing",
-    "pedestrian crossing ahead",
-    "speed 40",
-    "speed 50",
-    "speed 60",
-    "speed 70",
-    "stop priority"};
+    std::vector<std::string> labels{
+            "bus prority lane",
+            "children crossing",
+            "hospital",
+            "level crossing with gate",
+            "no honking",
+            "no left turn",
+            "no right turn",
+            "no u turn",
+            "other",
+            "pedestrian crossing",
+            "pedestrian crossing ahead",
+            "speed limit",
+    };
 private:
     static std::vector<BoxInfo> decode_infer(ncnn::Mat &data, const cv::Size &frame_size, float threshold);
 

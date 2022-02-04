@@ -10,21 +10,20 @@ public class Box {
     /**
      * 检测人脸，判断是否佩戴口罩
      */
-    private static final String[] labels = {"bus prority lane",
+    private static final String[] labels = {
+            "bus prority lane",
             "children crossing",
             "hospital",
-            "level crossing with gates",
+            "level crossing with gate",
             "no honking",
             "no left turn",
             "no right turn",
             "no u turn",
+            "other",
             "pedestrian crossing",
             "pedestrian crossing ahead",
-            "speed 40",
-            "speed 50",
-            "speed 60",
-            "speed 70",
-            "stop priority"};
+            "speed limit",
+    };
 
     public Box(float x0, float y0, float x1, float y1, int label, float score) {
         this.x0 = x0;

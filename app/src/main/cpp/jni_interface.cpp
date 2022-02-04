@@ -21,7 +21,7 @@ extern "C" JNIEXPORT void JNICALL
 Java_com_example_YOLOv4_init(JNIEnv *env, jclass, jobject assetManager) {
     if (yolov4::detector == nullptr) {
         AAssetManager *mgr = AAssetManager_fromJava(env, assetManager);
-        yolov4::detector = new yolov4(mgr, "yolov4-tiny_opt.param", "yolov4-tiny_opt.bin", false);
+        yolov4::detector = new yolov4(mgr, "custom-yolov4-tiny-detector_opt.param", "custom-yolov4-tiny-detector_opt.bin", false);
     }
 }
 
