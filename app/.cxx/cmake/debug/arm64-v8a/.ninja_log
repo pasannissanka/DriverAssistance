@@ -1,4 +1,0 @@
-# ninja log v5
-0	7300	659196398	CMakeFiles/yolov4.dir/jni_interface.cpp.o	c4ae99e9d90ae142
-4	7552	659196398	CMakeFiles/yolov4.dir/yolov4.cpp.o	322d7b95e09f3988
-7552	10138	659196401	libyolov4.so	c4f3e2f7396f097
