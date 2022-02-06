@@ -24,6 +24,7 @@ import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.YuvImage;
 import android.media.ExifInterface;
@@ -31,6 +32,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 
+import android.util.Log;
 import android.util.Size;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -41,12 +43,20 @@ import androidx.core.content.ContextCompat;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static java.lang.Math.pow;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+import com.google.mlkit.vision.common.InputImage;
+import com.google.mlkit.vision.text.Text;
+import com.google.mlkit.vision.text.TextRecognition;
+import com.google.mlkit.vision.text.TextRecognizer;
 
 public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_PICK_IMAGE = 2;
@@ -70,6 +80,8 @@ public class MainActivity extends AppCompatActivity {
     private int height;
     private static final Paint boxPaint = new Paint();
 
+    private TextRecognizer recognizer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,6 +103,9 @@ public class MainActivity extends AppCompatActivity {
 
         final String format = "Thresh: %.2f, NMS: %.2f";
         thresholdTextview.setText(String.format(Locale.ENGLISH, format, threshold, nms_threshold));
+
+        // ML-Kit Text Recognizer
+        recognizer = TextRecognition.getClient();
 
         Button inference = findViewById(R.id.button);
         inference.setOnClickListener(view -> {
@@ -138,6 +153,8 @@ public class MainActivity extends AppCompatActivity {
             }
             detecting.set(true);
             final Bitmap bitmapsrc = imageToBitmap(image);  // 格式转换
+
+            // Detection Thread
             Thread detectThread = new Thread(() -> {
                 Matrix matrix = new Matrix();
                 matrix.postRotate(rotationDegrees);
@@ -159,39 +176,62 @@ public class MainActivity extends AppCompatActivity {
                 boxPaint.setStyle(Paint.Style.STROKE);
                 boxPaint.setStrokeWidth(strokeWidth);
                 boxPaint.setTextSize(textSize);
-                List<Box> nomaskBox = new ArrayList<>();
-                float imageArea = width * height;
+
+//                float imageArea = width * height;
                 for (Box box : result) {
                     boxPaint.setColor(box.getColor());
                     boxPaint.setStyle(Paint.Style.FILL);
                     String score = Integer.toString((int) (box.getScore() * 100));
-                    canvas.drawText(box.getLabel() + " [" + score + "%]",
+
+                    final String[] label = {""};
+                    label[0] = box.getLabel();
+
+                    if ("speed limit".equals(box.getLabel())) {
+                        RectF rect = box.getRect();
+                        // Crop speed limit Bounding box
+                        assert(rect.left < rect.right && rect.top < rect.bottom);
+                        Bitmap croppedBmp = Bitmap.createBitmap(mutableBitmap, (int) box.x0, (int) box.y0, (int) rect.width(), (int) rect.height());
+                        Bitmap scaledBmp = Bitmap.createScaledBitmap(croppedBmp, 600, 600, true);
+                        InputImage ocrImg = InputImage.fromBitmap(scaledBmp, 0);
+
+                        // Do OCR
+                        Task<Text> recognizerResult = recognizer.process(ocrImg)
+                                .addOnSuccessListener(new OnSuccessListener<Text>() {
+                                    @Override
+                                    public void onSuccess(Text visionText) {
+                                        // Task completed successfully
+                                        String resultText = processTextRecognitionResult(visionText);
+                                        label[0] = resultText;
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        // Task failed with an exception
+                                        Log.e("MLKIT", e.toString());
+                                    }
+                                });
+                        try {
+                            Tasks.await(recognizerResult);
+                        } catch (ExecutionException | InterruptedException e) {
+                            Log.e("RECOGNIZER", e.toString());
+                        }
+                    }
+                    // Set Bounding Boxes and Labels
+                    canvas.drawText(label[0] + " [" + score + "%]",
                             box.x0 - strokeWidth, box.y0 - strokeWidth
                             , boxPaint);
                     boxPaint.setStyle(Paint.Style.STROKE);
                     canvas.drawRect(box.getRect(), boxPaint);
-                    if ("masked".equals(box.getLabel())) {
-                        continue;
-                    }
-                    float boxArea = (box.x1 - box.x0) * (box.y1 - box.y0);
-                    if (boxArea / imageArea > 0.3) {
-                        continue;
-                    }
-                    nomaskBox.add(box);
                 }
 
-                List<Float[]> dangerousLineMatrix = calDistance(nomaskBox);
-                boxPaint.setColor(Color.argb(255, 255, 165, 0));
-                for (Float[] location : dangerousLineMatrix) {
-                    canvas.drawLine(location[0], location[1], location[2], location[3], boxPaint);
-                }
-
+                // UI Thread
                 runOnUiThread(() -> {
                     resultImageView.setImageBitmap(mutableBitmap);
                     detecting.set(false);
                     long dur = endTime - startTime;
                     float fps = (float) (1000.0 / dur);
-                    tvInfo.setText(String.format(Locale.CHINESE,
+                    tvInfo.setText(String.format(Locale.ENGLISH,
                             "ImgSize: %dx%d\nUseTime: %d ms\nDetectFPS: %.2f",
                             height, width, dur, fps));
                 });
@@ -281,25 +321,6 @@ public class MainActivity extends AppCompatActivity {
             canvas.drawRect(box.getRect(), boxPaint);
         }
 
-        //距离计算
-        List<Box> nomaskBox = new ArrayList<>();
-        float imageArea = image.getWidth() * image.getHeight();
-        for (Box box : result) {
-            if ("masked".equals(box.getLabel())) {
-                continue;
-            }
-            float boxArea = (box.x1 - box.x0) * (box.y1 - box.y0);
-            if (boxArea / imageArea > 0.3) {
-                continue;
-            }
-            nomaskBox.add(box);
-        }
-        List<Float[]> dangerousLineMatrix = calDistance(nomaskBox);
-        boxPaint.setColor(Color.argb(255, 255, 165, 0));
-        for (Float[] location : dangerousLineMatrix) {
-            canvas.drawLine(location[0], location[1], location[2], location[3], boxPaint);
-        }
-
         if (result.length != 0) {
             scoreAvg = scoreAvg / result.length;
         }
@@ -312,36 +333,13 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    static double DisRatioBox = 3;
-
-    private ArrayList<Float[]> calDistance(List<Box> element) {
-        ArrayList<Float[]> dangerousLineMatrix = new ArrayList<>();
-
-        for (int i = 0; i < element.size(); i++) {
-            Box box = element.get(i);
-            float centerX = (box.x0 + box.x1) / 2;
-            float centerY = (box.y0 + box.y1) / 2;
-            float boxArea = (box.x1 - box.x0) * (box.y1 - box.y0);
-            for (int j = i + 1; j < element.size(); j++) {
-                Box nowBox = element.get(j);
-                float nowBoxArea = (nowBox.x1 - nowBox.x0) * (nowBox.y1 - nowBox.y0);
-                float maxArea = Math.max(nowBoxArea, boxArea);
-                if (Math.abs(nowBoxArea - boxArea) / maxArea > 0.3) {
-                    continue;
-                }
-                float nowCenterX = (nowBox.x0 + nowBox.x1) / 2;
-                float nowCenterY = (nowBox.y0 + nowBox.y1) / 2;
-                double pixelDistance = Math.sqrt(pow(nowCenterX - centerX, 2) + pow(nowCenterY - centerY, 2));
-                double realRatio = pixelDistance / (nowBox.y1 - nowBox.y0);
-                //safe distance
-                if (realRatio > DisRatioBox) {
-                    continue;
-                }
-                //dangerous
-                dangerousLineMatrix.add(new Float[]{centerX, centerY, nowCenterX, nowCenterY,});
-            }
+    private String processTextRecognitionResult(Text texts) {
+        List<Text.TextBlock> blocks = texts.getTextBlocks();
+        // Fallback to Object label
+        if (blocks.size() == 0) {
+            return "speed limit";
         }
-        return dangerousLineMatrix;
+        return texts.getText();
     }
 
     public Bitmap getPicture(Uri selectedImage) {
