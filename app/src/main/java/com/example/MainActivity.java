@@ -19,7 +19,6 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.Paint;
@@ -49,14 +48,14 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
+
 
 public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_PICK_IMAGE = 2;
@@ -105,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
         thresholdTextview.setText(String.format(Locale.ENGLISH, format, threshold, nms_threshold));
 
         // ML-Kit Text Recognizer
-        recognizer = TextRecognition.getClient();
+        recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
 
         Button inference = findViewById(R.id.button);
         inference.setOnClickListener(view -> {
@@ -125,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
 
         PreviewConfig previewConfig = new PreviewConfig.Builder()
                 .setLensFacing(CameraX.LensFacing.BACK)
-                .setTargetResolution(new Size(416, 416))  // 分辨率
+                .setTargetResolution(new Size(416, 416))  // Resolution
                 .build();
 
         Preview preview = new Preview(previewConfig);
@@ -138,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
     private UseCase gainAnalyzer(DetectAnalyzer detectAnalyzer) {
         ImageAnalysisConfig.Builder analysisConfigBuilder = new ImageAnalysisConfig.Builder();
         analysisConfigBuilder.setImageReaderMode(ImageAnalysis.ImageReaderMode.ACQUIRE_LATEST_IMAGE);
-        analysisConfigBuilder.setTargetResolution(new Size(416, 416));  // 输出预览图像尺寸
+        analysisConfigBuilder.setTargetResolution(new Size(416, 416));  // Output Preview ImageSize
         ImageAnalysisConfig config = analysisConfigBuilder.build();
         ImageAnalysis analysis = new ImageAnalysis(config);
         analysis.setAnalyzer(detectAnalyzer);
@@ -146,21 +145,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private class DetectAnalyzer implements ImageAnalysis.Analyzer {
+        final String LOG = "DETECTOR";
+
         @Override
         public void analyze(ImageProxy image, final int rotationDegrees) {
             if (detecting.get() || detectPhoto.get()) {
                 return;
             }
             detecting.set(true);
-            final Bitmap bitmapsrc = imageToBitmap(image);  // 格式转换
+            final Bitmap bitmapSrc = imageToBitmap(image);  // Format Conversion
 
             // Detection Thread
             Thread detectThread = new Thread(() -> {
                 Matrix matrix = new Matrix();
                 matrix.postRotate(rotationDegrees);
-                width = bitmapsrc.getWidth();
-                height = bitmapsrc.getHeight();
-                Bitmap bitmap = Bitmap.createBitmap(bitmapsrc, 0, 0, width, height, matrix, false);
+                width = bitmapSrc.getWidth();
+                height = bitmapSrc.getHeight();
+                Bitmap bitmap = Bitmap.createBitmap(bitmapSrc, 0, 0, width, height, matrix, false);
 
                 startTime = System.currentTimeMillis();
                 Box[] result = YOLOv4.detect(bitmap, threshold, nms_threshold);
@@ -177,55 +178,53 @@ public class MainActivity extends AppCompatActivity {
                 boxPaint.setStrokeWidth(strokeWidth);
                 boxPaint.setTextSize(textSize);
 
-//                float imageArea = width * height;
-                for (Box box : result) {
-                    boxPaint.setColor(box.getColor());
-                    boxPaint.setStyle(Paint.Style.FILL);
-                    String score = Integer.toString((int) (box.getScore() * 100));
+                try {
+                    for (Box box : result) {
+                        boxPaint.setColor(box.getColor());
+                        boxPaint.setStyle(Paint.Style.FILL);
+                        String score = Integer.toString((int) (box.getScore() * 100));
 
-                    final String[] label = {""};
-                    label[0] = box.getLabel();
+                        final String[] label = {""};
+                        label[0] = box.getLabel();
 
-                    if ("speed limit".equals(box.getLabel())) {
-                        RectF rect = box.getRect();
-                        // Crop speed limit Bounding box
-                        assert(rect.left < rect.right && rect.top < rect.bottom);
-                        Bitmap croppedBmp = Bitmap.createBitmap(mutableBitmap, (int) box.x0, (int) box.y0, (int) rect.width(), (int) rect.height());
-                        Bitmap scaledBmp = Bitmap.createScaledBitmap(croppedBmp, 600, 600, true);
-                        InputImage ocrImg = InputImage.fromBitmap(scaledBmp, 0);
+                        // Perform OCR for speed limit detections
+                        if ("speed limit".equals(box.getLabel())) {
+                            RectF rect = box.getRect();
+                            // Crop speed limit Bounding box
+                            assert(rect.left < rect.right && rect.top < rect.bottom);
+                            Bitmap croppedBmp = Bitmap.createBitmap(mutableBitmap,
+                                    (int) rect.left, (int) rect.top,
+                                    (int) rect.width(), (int) rect.height());
+                            Bitmap scaledBmp = Bitmap.createScaledBitmap(croppedBmp,
+                                    600, 600, true);
+                            InputImage ocrImg = InputImage.fromBitmap(scaledBmp, 0);
 
-                        // Do OCR
-                        Task<Text> recognizerResult = recognizer.process(ocrImg)
-                                .addOnSuccessListener(new OnSuccessListener<Text>() {
-                                    @Override
-                                    public void onSuccess(Text visionText) {
+                            // Do OCR
+                            Task<Text> recognizerResult = recognizer.process(ocrImg)
+                                    .addOnSuccessListener(visionText -> {
                                         // Task completed successfully
                                         String resultText = processTextRecognitionResult(visionText);
                                         label[0] = resultText;
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
+                                    })
+                                    .addOnFailureListener(e -> {
                                         // Task failed with an exception
-                                        Log.e("MLKIT", e.toString());
-                                    }
-                                });
-                        try {
+                                        Log.e(LOG + "OCR", e.toString());
+                                    });
+                            // Wait for OCR to finish
                             Tasks.await(recognizerResult);
-                        } catch (ExecutionException | InterruptedException e) {
-                            Log.e("RECOGNIZER", e.toString());
                         }
+                        // Set Bounding Boxes and Labels
+                        canvas.drawText(label[0] + " [" + score + "%]",
+                                box.x0 - strokeWidth, box.y0 - strokeWidth
+                                , boxPaint);
+                        boxPaint.setStyle(Paint.Style.STROKE);
+                        canvas.drawRect(box.getRect(), boxPaint);
                     }
-                    // Set Bounding Boxes and Labels
-                    canvas.drawText(label[0] + " [" + score + "%]",
-                            box.x0 - strokeWidth, box.y0 - strokeWidth
-                            , boxPaint);
-                    boxPaint.setStyle(Paint.Style.STROKE);
-                    canvas.drawRect(box.getRect(), boxPaint);
+                } catch (Exception e) {
+                    Log.e(LOG, e.toString());
                 }
 
-                // UI Thread
+                // Run UI Drawing on UI Thread
                 runOnUiThread(() -> {
                     resultImageView.setImageBitmap(mutableBitmap);
                     detecting.set(false);

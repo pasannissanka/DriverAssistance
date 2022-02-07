@@ -11,7 +11,7 @@ yolov4::yolov4(AAssetManager *mgr, const char *param, const char *bin, bool useG
     Net = new ncnn::Net();
 
     Net->opt.use_vulkan_compute = toUseGPU;  // GPU
-    Net->opt.use_fp16_arithmetic = true;  // FP16运算加速
+    Net->opt.use_fp16_arithmetic = true;  // FP16 arithmetic acceleration
     Net->load_param(mgr, param);
     Net->load_model(mgr, bin);
 }
@@ -44,7 +44,7 @@ yolov4::detect(JNIEnv *env, jobject image, float threshold, float nms_threshold)
     return result;
 }
 /**
- * 从Mat->data值求bbox的实际参数值
+ * Calculate the actual parameter value of bbox from the Mat->data value
  * @param data
  * @param frame_size
  * @param threshold

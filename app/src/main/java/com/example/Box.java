@@ -7,9 +7,8 @@ public class Box {
     public float x0, y0, x1, y1;
     private final int label;
     private final float score;
-    /**
-     * 检测人脸，判断是否佩戴口罩
-     */
+
+    // Labels to Detect
     private static final String[] labels = {
             "bus prority lane",
             "children crossing",
