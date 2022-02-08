@@ -23,7 +23,15 @@ add_library(
 
 include_directories(
         ncnnvulkan/include
+        Eigen
 )
+
+#add_subdirectory(Eigen)
+
+#add_library(deepsort SHARED ${SRC_LIST})
+#add_library( Eigen3 STATIC IMPORTED )
+
+
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
 # default, you only need to specify the name of the public NDK library
@@ -48,6 +56,7 @@ add_library(glslang STATIC IMPORTED)
 add_library(OGLCompiler STATIC IMPORTED)
 add_library(OSDependent STATIC IMPORTED)
 add_library(SPIRV STATIC IMPORTED)
+
 set_target_properties(glslang PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/ncnnvulkan/${ANDROID_ABI}/libglslang.a)
 set_target_properties(OGLCompiler PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/ncnnvulkan/${ANDROID_ABI}/libOGLCompiler.a)
 set_target_properties(OSDependent PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/ncnnvulkan/${ANDROID_ABI}/libOSDependent.a)
@@ -60,6 +69,7 @@ set_target_properties(SPIRV PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/ncn
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -frtti")
 target_link_libraries( # Specifies the target library.
         yolov4
+#        deepsort
 
         # Links the target library to the log library
         # included in the NDK.
@@ -76,6 +86,7 @@ target_link_libraries( # Specifies the target library.
 
 target_link_libraries( # Specifies the target library.
         yolov4
+#        deepsort
 
         # Links the target library to the log library
         # included in the NDK.
@@ -84,4 +95,6 @@ target_link_libraries( # Specifies the target library.
         ${android-lib}
         ${jnigraphics-lib}
         ncnn
-        glslang SPIRV OGLCompiler OSDependent )
+        glslang SPIRV OGLCompiler OSDependent
+#        Eigen3::Eigen
+        )

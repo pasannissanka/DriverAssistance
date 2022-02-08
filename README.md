@@ -11,6 +11,8 @@
 + Using [Android Studio](https://developer.android.com/studio) to build this project.
 + You need install Android SDK , Android NDK and CMake additional in Android Studio.
 
++ Copy Eigen library header files to src/main/cpp/Eigen
+[Download Eigen](https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.zip) Then copy Eigen folder to src/main/cpp/Eigen
 
 ---
 
