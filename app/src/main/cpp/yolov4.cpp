@@ -66,7 +66,6 @@ yolov4::decode_infer(ncnn::Mat &data, const cv::Size &frame_size, float threshol
         if (box.score < threshold) {
             continue;
         }
-        box.ids_ = {};
         result.push_back(box);
 
     }

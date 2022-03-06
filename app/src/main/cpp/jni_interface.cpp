@@ -45,7 +45,7 @@ Java_com_example_YOLOv4_detect(JNIEnv *env, jclass, jobject image, jdouble thres
     jclass vector_cls = env->FindClass("java/util/Vector");
     jmethodID vector_add_mid = env->GetMethodID(vector_cls, "add", "(Ljava/lang/Object;)Z");
 
-    jclass float_cls = env->FindClass("java/lang/Float");
+    jclass int_cls = env->FindClass("java/lang/Integer");
 
     jclass box_cls = env->FindClass("com/example/Box");
     jmethodID cid = env->GetMethodID(box_cls, "<init>", "(FFFFIFLjava/util/Vector;)V");
@@ -58,11 +58,11 @@ Java_com_example_YOLOv4_detect(JNIEnv *env, jclass, jobject image, jdouble thres
         jmethodID vector_cid = env->GetMethodID(vector_cls, "<init>", "()V");
         jobject vector_val = env->NewObject(vector_cls, vector_cid);
 
-        for (float f: track_id) {
-            jmethodID float_cid = env->GetMethodID(float_cls, "<init>", "(F)V");
-            jobject float_val = env->NewObject(float_cls, float_cid, f);
+        for (int f: track_id) {
+            jmethodID int_cid = env->GetMethodID(int_cls, "<init>", "(I)V");
+            jobject int_val = env->NewObject(int_cls, int_cid, f);
 
-            env->CallBooleanMethod(vector_val, vector_add_mid, float_val);
+            env->CallBooleanMethod(vector_val, vector_add_mid, int_val);
         }
         jobject obj = env->NewObject(box_cls, cid, box.x1, box.y1, box.x2, box.y2, box.label,
                                      box.score, vector_val);

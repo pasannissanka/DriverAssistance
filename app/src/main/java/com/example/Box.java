@@ -9,7 +9,7 @@ public class Box {
     public float x0, y0, x1, y1;
     private final int label;
     private final float score;
-    private final Vector<Float> ids_;
+    private final Vector<Integer> track_id;
 
     // Labels to Detect
     private static final String[] labels = {
@@ -27,14 +27,14 @@ public class Box {
             "speed limit",
     };
 
-    public Box(float x0, float y0, float x1, float y1, int label, float score, Vector<Float> ids_) {
+    public Box(float x0, float y0, float x1, float y1, int label, float score, Vector<Integer> track_id) {
         this.x0 = x0;
         this.y0 = y0;
         this.x1 = x1;
         this.y1 = y1;
         this.label = label;
         this.score = score;
-        this.ids_ = ids_;
+        this.track_id = track_id;
     }
 
     public RectF getRect() {
@@ -56,5 +56,5 @@ public class Box {
         return Color.argb(255, 50, 205, 50);
     }
 
-    public Vector<Float> getIds() { return ids_; }
+    public Vector<Integer> getIds() { return track_id; }
 }

@@ -23,7 +23,6 @@ typedef struct BoxInfo {
     float y2;
     float score;
     int label;
-    std::vector<float> ids_;
 } BoxInfo;
 
 class yolov4 {

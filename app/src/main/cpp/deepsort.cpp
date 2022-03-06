@@ -28,10 +28,10 @@ int deepsort::load_detections(std::vector<BoxInfo>& obj_info) {
     {
         DETECTION_ROW box;
         box.tlwh = DETECTBOX(obj_info[i].x1, obj_info[i].y1, obj_info[i].x2 - obj_info[i].x1, obj_info[i].y2 - obj_info[i].y1);
-        for(int j = 0; j < 128; j++)
-        {
-            box.feature[j] = obj_info[i].ids_[j];
-        }
+//        for(int j = 0; j < 128; j++)
+//        {
+//            box.feature[j] = obj_info[i].ids_[j];
+//        }
         detections_.push_back(box);
     }
     return 0;
