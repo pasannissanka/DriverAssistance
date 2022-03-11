@@ -24,6 +24,11 @@ add_library(
 include_directories(
         ncnnvulkan/include
 )
+
+#opencv
+include_directories(
+        opencv/include
+)
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
 # default, you only need to specify the name of the public NDK library
@@ -53,6 +58,14 @@ set_target_properties(OGLCompiler PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DI
 set_target_properties(OSDependent PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/ncnnvulkan/${ANDROID_ABI}/libOSDependent.a)
 set_target_properties(SPIRV PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/ncnnvulkan/${ANDROID_ABI}/libSPIRV.a)
 
+#opencv
+add_library(lib_opencv SHARED IMPORTED)
+set_target_properties(
+        lib_opencv
+        PROPERTIES IMPORTED_LOCATION
+        ${CMAKE_SOURCE_DIR}/opencv/${ANDROID_ABI}/libopencv_java4.so
+)
+
 # disable rtti and exceptions
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti -fno-exceptions")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
@@ -67,6 +80,9 @@ target_link_libraries( # Specifies the target library.
         ${vulkan-lib}
         ${android-lib}
         ${jnigraphics-lib}
+
+        #opencv
+        lib_opencv
         )
 
 

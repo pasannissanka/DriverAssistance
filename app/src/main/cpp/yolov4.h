@@ -3,7 +3,7 @@
 
 #include "ncnn/net.h"
 
-namespace cv {
+namespace yolo {
     typedef struct {
         int width;
         int height;
@@ -13,7 +13,7 @@ namespace cv {
 typedef struct {
     std::string name;
     int stride;
-    std::vector<cv::Size> anchors;
+    std::vector<yolo::Size> anchors;
 } YoloLayerData;
 
 typedef struct BoxInfo {
@@ -23,6 +23,10 @@ typedef struct BoxInfo {
     float y2;
     float score;
     int label;
+
+    // sort
+//    int frame;
+    int id;
 
 } BoxInfo;
 
@@ -49,7 +53,7 @@ public:
             "speed limit",
     };
 private:
-    static std::vector<BoxInfo> decode_infer(ncnn::Mat &data, const cv::Size &frame_size, float threshold);
+    static std::vector<BoxInfo> decode_infer(ncnn::Mat &data, const yolo::Size &frame_size, float threshold);
 
     ncnn::Net *Net;
     int input_size = 416;
@@ -60,8 +64,6 @@ public:
     static yolov4 *detector;
     static bool hasGPU;
     static bool toUseGPU;
-
-
 };
 
 

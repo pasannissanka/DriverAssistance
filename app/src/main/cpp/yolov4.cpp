@@ -51,7 +51,7 @@ yolov4::detect(JNIEnv *env, jobject image, float threshold, float nms_threshold)
  * @return
  */
 std::vector<BoxInfo>
-yolov4::decode_infer(ncnn::Mat &data, const cv::Size &frame_size, float threshold) {
+yolov4::decode_infer(ncnn::Mat &data, const yolo::Size &frame_size, float threshold) {
     std::vector<BoxInfo> result;
     for (int i = 0; i < data.h; i++) {
         BoxInfo box;
