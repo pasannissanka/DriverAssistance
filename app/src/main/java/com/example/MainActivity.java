@@ -214,9 +214,10 @@ public class MainActivity extends AppCompatActivity {
                             Tasks.await(recognizerResult);
                         }
                         // Set Bounding Boxes and Labels
-                        canvas.drawText(label[0] + " [" + score + "%] " + " id: " + box.getId() ,
+                        canvas.drawText(label[0] + " [" + score + "%]",
                                 box.x0 - strokeWidth, box.y0 - strokeWidth
                                 , boxPaint);
+                        canvas.drawText("id: " + box.getId(), box.x1 - strokeWidth, box.y1 - strokeWidth, boxPaint);
                         boxPaint.setStyle(Paint.Style.STROKE);
                         canvas.drawRect(box.getRect(), boxPaint);
                     }

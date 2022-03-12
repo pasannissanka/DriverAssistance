@@ -23,6 +23,8 @@ add_library(
 
 include_directories(
         ncnnvulkan/include
+        Eigen
+        include
 )
 
 #opencv

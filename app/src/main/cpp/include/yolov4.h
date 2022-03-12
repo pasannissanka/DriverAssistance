@@ -1,7 +1,8 @@
 #ifndef YOLOV4_H
 #define YOLOV4_H
 
-#include "ncnn/net.h"
+#include "../ncnnvulkan/include/ncnn/net.h"
+#include "../opencv/include/opencv2/video/tracking.hpp"
 
 namespace yolo {
     typedef struct {
@@ -17,15 +18,9 @@ typedef struct {
 } YoloLayerData;
 
 typedef struct BoxInfo {
-    float x1;
-    float y1;
-    float x2;
-    float y2;
+    cv::Rect box;
     float score;
     int label;
-
-    // sort
-//    int frame;
     int id;
 
 } BoxInfo;

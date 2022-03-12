@@ -1,4 +1,4 @@
-#include "yolov4.h"
+#include "include/yolov4.h"
 
 bool yolov4::hasGPU = false;
 bool yolov4::toUseGPU = false;
@@ -56,10 +56,10 @@ yolov4::decode_infer(ncnn::Mat &data, const yolo::Size &frame_size, float thresh
     for (int i = 0; i < data.h; i++) {
         BoxInfo box;
         const float *values = data.row(i);
-        box.x1 = values[2] * (float) frame_size.width;
-        box.y1 = values[3] * (float) frame_size.height;
-        box.x2 = values[4] * (float) frame_size.width;
-        box.y2 = values[5] * (float) frame_size.height;
+        box.box.x = values[2] * (float) frame_size.width;
+        box.box.y = values[3] * (float) frame_size.height;
+        box.box.width = values[4] * (float) frame_size.width - box.box.x;
+        box.box.height = values[5] * (float) frame_size.height - box.box.y;
         box.label = (int) values[0] - 1;
         box.score = values[1];
         if (box.score < threshold) {
@@ -76,15 +76,14 @@ void yolov4::nms(std::vector<BoxInfo> &input_boxes, float NMS_THRESH) {
               [](BoxInfo a, BoxInfo b) { return a.score > b.score; });
     std::vector<float> vArea(input_boxes.size());
     for (int i = 0; i < int(input_boxes.size()); ++i) {
-        vArea[i] = (input_boxes.at(i).x2 - input_boxes.at(i).x1 + 1)
-                   * (input_boxes.at(i).y2 - input_boxes.at(i).y1 + 1);
+        vArea[i] = input_boxes.at(i).box.area();
     }
     for (int i = 0; i < int(input_boxes.size()); ++i) {
         for (int j = i + 1; j < int(input_boxes.size());) {
-            float xx1 = std::max(input_boxes[i].x1, input_boxes[j].x1);
-            float yy1 = std::max(input_boxes[i].y1, input_boxes[j].y1);
-            float xx2 = std::min(input_boxes[i].x2, input_boxes[j].x2);
-            float yy2 = std::min(input_boxes[i].y2, input_boxes[j].y2);
+            float xx1 = std::max(input_boxes[i].box.x, input_boxes[j].box.x);
+            float yy1 = std::max(input_boxes[i].box.y, input_boxes[j].box.y);
+            float xx2 = std::min(input_boxes[i].box.width + input_boxes[i].box.x, input_boxes[j].box.width + input_boxes[j].box.x);
+            float yy2 = std::min(input_boxes[i].box.height + input_boxes[i].box.y, input_boxes[j].box.height + input_boxes[j].box.y);
             float w = std::max(float(0), xx2 - xx1 + 1);
             float h = std::max(float(0), yy2 - yy1 + 1);
             float inter = w * h;

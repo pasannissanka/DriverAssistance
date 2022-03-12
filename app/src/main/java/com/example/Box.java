@@ -7,7 +7,6 @@ public class Box {
     public float x0, y0, x1, y1;
     private final int label;
     private final float score;
-    private final int frame;
     private final int id;
 
     // Labels to Detect
@@ -26,14 +25,13 @@ public class Box {
             "speed limit",
     };
 
-    public Box(float x0, float y0, float x1, float y1, int label, float score, int frame, int id) {
+    public Box(float x0, float y0, float x1, float y1, int label, float score, int id) {
         this.x0 = x0;
         this.y0 = y0;
         this.x1 = x1;
         this.y1 = y1;
         this.label = label;
         this.score = score;
-        this.frame = frame;
         this.id = id;
     }
 
