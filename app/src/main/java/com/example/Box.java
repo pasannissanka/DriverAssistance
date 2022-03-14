@@ -48,9 +48,6 @@ public class Box {
     }
 
     public int getColor() {
-        if (label == 11) {
-            return Color.argb(255, 220, 20, 60);
-        }
         return Color.argb(255, 50, 205, 50);
     }
 

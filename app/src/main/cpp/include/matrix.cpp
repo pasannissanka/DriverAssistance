@@ -18,9 +18,9 @@
 
 #include "matrix.h"
 
-#include "../../../../../../../../Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/cassert"
-#include "../../../../../../../../Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/cstdlib"
-#include "../../../../../../../../Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/algorithm"
+#include <cassert>
+#include <cstdlib>
+#include <algorithm>
 
 /*export*/ template <class T>
 Matrix<T>::Matrix() {

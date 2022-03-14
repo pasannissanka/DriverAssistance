@@ -19,9 +19,9 @@
 #ifndef _MATRIX_H_
 #define _MATRIX_H_
 
-#include "../../../../../../../../Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/initializer_list"
-#include "../../../../../../../../Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/cstdlib"
-#include "../../../../../../../../Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/ostream"
+#include <initializer_list>
+#include <cstdlib>
+#include <ostream>
 
 template <class T>
 class Matrix {

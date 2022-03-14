@@ -1,12 +1,12 @@
 #pragma once
 
-#include "../../../../../../../../Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/map"
 #include "../opencv/include/opencv2/core.hpp"
 
 #include "track.h"
 #include "munkres.h"
 #include "utils.h"
 #include "yolov4.h"
+#include <map>
 
 class Tracker
 {
