@@ -2,6 +2,7 @@ package com.example;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.CameraX;
 import androidx.camera.core.ImageAnalysis;
@@ -13,6 +14,7 @@ import androidx.camera.core.UseCase;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -42,8 +44,10 @@ import androidx.core.content.ContextCompat;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Stack;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -67,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView thresholdTextview;
     private TextView tvInfo;
+    private TextView detectedObjectView;
     private final double threshold = 0.35;
     private final double nms_threshold = 0.7;
 
@@ -80,6 +85,8 @@ public class MainActivity extends AppCompatActivity {
     private static final Paint boxPaint = new Paint();
 
     private TextRecognizer recognizer;
+
+    Stack<String> detected = new Stack<String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
         resultImageView = findViewById(R.id.imageView);
         thresholdTextview = findViewById(R.id.valTxtView);
         tvInfo = findViewById(R.id.tv_info);
+        detectedObjectView = findViewById(R.id.objectView);
 
         final String format = "Thresh: %.2f, NMS: %.2f";
         thresholdTextview.setText(String.format(Locale.ENGLISH, format, threshold, nms_threshold));
@@ -142,6 +150,25 @@ public class MainActivity extends AppCompatActivity {
         ImageAnalysis analysis = new ImageAnalysis(config);
         analysis.setAnalyzer(detectAnalyzer);
         return analysis;
+    }
+
+
+    public void popupMessage(String text){
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setMessage(text);
+        alertDialogBuilder.setTitle("Detected Object");
+        alertDialogBuilder.setNegativeButton("ok", new DialogInterface.OnClickListener(){
+
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Log.d("internet","Ok btn pressed");
+                // add these two lines, if you wish to close the app:
+                finishAffinity();
+                System.exit(0);
+            }
+        });
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
     }
 
     private class DetectAnalyzer implements ImageAnalysis.Analyzer {
@@ -220,6 +247,7 @@ public class MainActivity extends AppCompatActivity {
                         canvas.drawText("id: " + box.getId(), box.x1 - strokeWidth, box.y1 - strokeWidth, boxPaint);
                         boxPaint.setStyle(Paint.Style.STROKE);
                         canvas.drawRect(box.getRect(), boxPaint);
+                        detected.add(box.getLabel());
                     }
                 } catch (Exception e) {
                     Log.e(LOG, e.toString());
@@ -234,6 +262,12 @@ public class MainActivity extends AppCompatActivity {
                     tvInfo.setText(String.format(Locale.ENGLISH,
                             "ImgSize: %dx%d\nUseTime: %d ms\nDetectFPS: %.2f",
                             height, width, dur, fps));
+
+                    if(detected.size()>0){
+                        detectedObjectView.setText(detected.lastElement());
+                        popupMessage(detected.lastElement());
+                    }
+
                 });
             }, "detect");
             detectThread.start();
