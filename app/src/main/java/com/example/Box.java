@@ -43,6 +43,10 @@ public class Box {
         return labels[label];
     }
 
+    public int getLabelId() {
+        return label;
+    }
+
     public float getScore() {
         return score;
     }
@@ -51,5 +55,7 @@ public class Box {
         return Color.argb(255, 50, 205, 50);
     }
 
-    public int getId() {return id; }
+    public int getId() {
+        return id;
+    }
 }

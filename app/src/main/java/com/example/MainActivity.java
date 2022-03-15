@@ -14,6 +14,7 @@ import androidx.camera.core.UseCase;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.content.Context;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -29,8 +30,12 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.YuvImage;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.media.ExifInterface;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 
@@ -43,6 +48,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -51,14 +57,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Stack;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
+import com.github.anastr.speedviewlib.SpeedView;
+import com.github.anastr.speedviewlib.TubeSpeedometer;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.mlkit.vision.common.InputImage;
@@ -69,16 +81,22 @@ import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
 
 
 public class MainActivity extends AppCompatActivity {
+    private MainActivity mainActivity;
+
     private static final int REQUEST_PICK_IMAGE = 2;
     private static final String[] PERMISSIONS = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.CAMERA
+            Manifest.permission.CAMERA,
+            Manifest.permission.ACCESS_FINE_LOCATION
     };
     private ImageView resultImageView;
 
     private TextView thresholdTextview;
     private TextView tvInfo;
     private TextView detectedObjectView;
+    private TubeSpeedometer speedometer;
+    private TextView tvSpeedLimit;
+
     private final double threshold = 0.35;
     private final double nms_threshold = 0.7;
 
@@ -104,14 +122,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    private final HashMap<Integer, Detection> detectedSpeedLimits = new HashMap<Integer, Detection>();
+    private final Stack<Detection> detectedSpeedLimitsStack = new Stack<>();
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initRecyclerView(); 
+        initRecyclerView();
         detected.add("Hello WOrld");
         detected.add("Hello ");
 
         getSupportActionBar().hide();
+
+        mainActivity = this;
 
         ActivityCompat.requestPermissions(this, PERMISSIONS, PackageManager.PERMISSION_GRANTED);
         while ((ContextCompat.checkSelfPermission(this.getApplicationContext(), PERMISSIONS[0]) == PackageManager.PERMISSION_DENIED
@@ -122,12 +146,41 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+
+        if (!this.isLocationEnabled(this)) {
+            //show dialog if Location Services is not enabled
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(R.string.gps_not_found_title);  // GPS not found
+            builder.setMessage(R.string.gps_not_found_message); // Want to enable?
+            builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    Intent intent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                }
+            });
+
+            //if no - bring user to selecting Static Location Activity
+            builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(mainActivity, "Please enable Location-based service / GPS", Toast.LENGTH_LONG).show();
+                }
+            });
+            builder.create().show();
+        }
+
         setContentView(R.layout.activity_main);
         YOLOv4.init(getAssets());
+
         resultImageView = findViewById(R.id.imageView);
         thresholdTextview = findViewById(R.id.valTxtView);
         tvInfo = findViewById(R.id.tv_info);
         detectedObjectView = findViewById(R.id.objectView);
+        tvSpeedLimit = findViewById(R.id.tvSpeedLimit);
+
+        speedometer = (TubeSpeedometer) findViewById(R.id.speedView);
+        speedometer.setMaxSpeed(200f);
 
         final String format = "Thresh: %.2f, NMS: %.2f";
         thresholdTextview.setText(String.format(Locale.ENGLISH, format, threshold, nms_threshold));
@@ -135,13 +188,7 @@ public class MainActivity extends AppCompatActivity {
         // ML-Kit Text Recognizer
         recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
 
-        Button inference = findViewById(R.id.button);
-        inference.setOnClickListener(view -> {
-            Intent intent = new Intent(Intent.ACTION_PICK);
-            intent.setType("image/*");
-            startActivityForResult(intent, REQUEST_PICK_IMAGE);
-        });
-
+        new SpeedTask(this).execute("string");
 
         resultImageView.setOnClickListener(v -> detectPhoto.set(false));
         startCamera();
@@ -175,11 +222,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void popupMessage(String text){
+    public void popupMessage(String text) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setMessage(text);
         alertDialogBuilder.setTitle("Detected Object");
-        alertDialogBuilder.setNegativeButton("ok", new DialogInterface.OnClickListener(){
+        alertDialogBuilder.setNegativeButton("ok", new DialogInterface.OnClickListener() {
 
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -187,7 +234,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        
+
         AlertDialog alertDialog = alertDialogBuilder.create();
         WindowManager.LayoutParams wmlp = alertDialog.getWindow().getAttributes();
         wmlp.gravity = Gravity.TOP | Gravity.LEFT;
@@ -243,8 +290,13 @@ public class MainActivity extends AppCompatActivity {
                         // Perform OCR for speed limit detections
                         if ("speed limit".equals(box.getLabel())) {
                             RectF rect = box.getRect();
+
+                            if (!detectedSpeedLimits.containsKey(box.getId())) {
+                                detectedSpeedLimits.put(box.getId(), new Detection(box.getLabelId(), box.getId()));
+                            }
+
                             // Crop speed limit Bounding box
-                            assert(rect.left < rect.right && rect.top < rect.bottom);
+                            assert (rect.left < rect.right && rect.top < rect.bottom);
                             Bitmap croppedBmp = Bitmap.createBitmap(mutableBitmap,
                                     (int) rect.left, (int) rect.top,
                                     (int) rect.width(), (int) rect.height());
@@ -258,6 +310,15 @@ public class MainActivity extends AppCompatActivity {
                                         // Task completed successfully
                                         String resultText = processTextRecognitionResult(visionText);
                                         label[0] = resultText;
+                                        if (detectedSpeedLimits.containsKey(box.getId())) {
+                                            Detection det = detectedSpeedLimits.get(box.getId());
+                                            String lastText = det.getSpeed().replaceAll("[^0-9]", "");
+                                            det.setSpeed(resultText);
+                                            detectedSpeedLimits.replace(box.getId(), det);
+                                            if (!lastText.equals(resultText.replaceAll("[^0-9]", ""))) {
+                                                detectedSpeedLimitsStack.push(det);
+                                            }
+                                        }
                                     })
                                     .addOnFailureListener(e -> {
                                         // Task failed with an exception
@@ -288,6 +349,10 @@ public class MainActivity extends AppCompatActivity {
                     tvInfo.setText(String.format(Locale.ENGLISH,
                             "ImgSize: %dx%d\nUseTime: %d ms\nDetectFPS: %.2f",
                             height, width, dur, fps));
+                    if (!detectedSpeedLimitsStack.empty()) {
+                        Detection newDetection = detectedSpeedLimitsStack.pop();
+                        tvSpeedLimit.setText(newDetection.getSpeed().replaceAll("[^0-9]", ""));
+                    }
                 });
             }, "detect");
             detectThread.start();
@@ -445,5 +510,77 @@ public class MainActivity extends AppCompatActivity {
         return returnBm;
     }
 
+    // Get speed by Location Manager
+    private class SpeedTask extends AsyncTask<String, Void, String> {
+        final MainActivity mainActivity;
+        float speed = 0.0f;
+        LocationManager locationManager;
 
+        public SpeedTask(MainActivity mainActivity) {
+            this.mainActivity = mainActivity;
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            locationManager = (LocationManager) mainActivity.getSystemService(Context.LOCATION_SERVICE);
+            return null;
+        }
+
+        protected void onPostExecute(String result) {
+            LocationListener listener = new LocationListener() {
+                float filtSpeed;
+                float localspeed;
+
+                @Override
+                public void onLocationChanged(Location location) {
+                    speed = location.getSpeed();
+                    Log.i("SPEED", "onLocationChanged: " + speed);
+                    localspeed = speed * 3.6f;
+                    filtSpeed = filter(filtSpeed, localspeed, 2);
+                    speedometer.speedTo(filtSpeed);
+                }
+
+                @Override
+                public void onStatusChanged(String s, int i, Bundle bundle) {
+                }
+
+                @Override
+                public void onProviderEnabled(String s) {
+                }
+
+                @Override
+                public void onProviderDisabled(String s) {
+                }
+            };
+            if (ActivityCompat.checkSelfPermission(mainActivity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(mainActivity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, listener);
+        }
+
+        /**
+         * Simple recursive filter
+         *
+         * @param prev Previous value of filter
+         * @param curr New input value into filter
+         * @return New filtered value
+         */
+        private float filter(final float prev, final float curr, final int ratio) {
+            // If first time through, initialise digital filter with current values
+            if (Float.isNaN(prev))
+                return curr;
+            // If current value is invalid, return previous filtered value
+            if (Float.isNaN(curr))
+                return prev;
+            // Calculate new filtered value
+            return (float) (curr / ratio + prev * (1.0 - 1.0 / ratio));
+        }
+    }
+
+    private boolean isLocationEnabled(Context mContext) {
+        LocationManager locationManager = (LocationManager)
+                mContext.getSystemService(Context.LOCATION_SERVICE);
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+    }
 }
