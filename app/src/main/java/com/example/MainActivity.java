@@ -14,6 +14,7 @@ import androidx.camera.core.UseCase;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -35,8 +36,12 @@ import android.provider.MediaStore;
 
 import android.util.Log;
 import android.util.Size;
+import android.view.Gravity;
+import android.view.WindowManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
@@ -121,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(intent, REQUEST_PICK_IMAGE);
         });
 
+
         resultImageView.setOnClickListener(v -> detectPhoto.set(false));
         startCamera();
 
@@ -161,13 +167,17 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                Log.d("internet","Ok btn pressed");
-                // add these two lines, if you wish to close the app:
-                finishAffinity();
-                System.exit(0);
+
+
             }
         });
+        
         AlertDialog alertDialog = alertDialogBuilder.create();
+        WindowManager.LayoutParams wmlp = alertDialog.getWindow().getAttributes();
+        wmlp.gravity = Gravity.TOP | Gravity.LEFT;
+        wmlp.x = 100;   //x position
+        wmlp.y = 100;   //y position
+
         alertDialog.show();
     }
 
