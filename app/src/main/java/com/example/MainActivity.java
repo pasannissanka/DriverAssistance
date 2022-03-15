@@ -101,8 +101,6 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<String> detected = new ArrayList<String>();
 
 
-
-
     private final HashMap<Integer, Detection> detectedSpeedLimits = new HashMap<Integer, Detection>();
     private final Stack<Detection> detectedSpeedLimitsStack = new Stack<>();
 
@@ -155,7 +153,6 @@ public class MainActivity extends AppCompatActivity {
         resultImageView = findViewById(R.id.imageView);
         thresholdTextview = findViewById(R.id.valTxtView);
         tvInfo = findViewById(R.id.tv_info);
-        detectedObjectView = findViewById(R.id.objectView);
         tvSpeedLimit = findViewById(R.id.tvSpeedLimit);
 
         speedometer = (TubeSpeedometer) findViewById(R.id.speedView);
