@@ -45,6 +45,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -80,6 +82,8 @@ public class MainActivity extends AppCompatActivity {
     private final double threshold = 0.35;
     private final double nms_threshold = 0.7;
 
+    private RecyclerView recyclerView;
+
     private final AtomicBoolean detecting = new AtomicBoolean(false);
     private final AtomicBoolean detectPhoto = new AtomicBoolean(false);
 
@@ -91,12 +95,24 @@ public class MainActivity extends AppCompatActivity {
 
     private TextRecognizer recognizer;
 
-    Stack<String> detected = new Stack<String>();
+    ArrayList<String> detected = new ArrayList<String>();
+
+    private void initRecyclerView(){
+        recyclerView = findViewById(R.id.my_recycler_view);
+        RecyclerViewAdapter adapter = new RecyclerViewAdapter(detected,this);
+        recyclerView.setAdapter(adapter);
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initRecyclerView(); 
+        detected.add("Hello WOrld");
+        detected.add("Hello ");
+
         getSupportActionBar().hide();
+
         ActivityCompat.requestPermissions(this, PERMISSIONS, PackageManager.PERMISSION_GRANTED);
         while ((ContextCompat.checkSelfPermission(this.getApplicationContext(), PERMISSIONS[0]) == PackageManager.PERMISSION_DENIED
                 || ContextCompat.checkSelfPermission(this.getApplicationContext(), PERMISSIONS[1]) == PackageManager.PERMISSION_DENIED)) {
@@ -272,12 +288,6 @@ public class MainActivity extends AppCompatActivity {
                     tvInfo.setText(String.format(Locale.ENGLISH,
                             "ImgSize: %dx%d\nUseTime: %d ms\nDetectFPS: %.2f",
                             height, width, dur, fps));
-
-                    if(detected.size()>0){
-                        detectedObjectView.setText(detected.lastElement());
-                        popupMessage(detected.lastElement());
-                    }
-
                 });
             }, "detect");
             detectThread.start();
