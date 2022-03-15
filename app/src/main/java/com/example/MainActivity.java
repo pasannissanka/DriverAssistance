@@ -12,10 +12,8 @@ import androidx.camera.core.Preview;
 import androidx.camera.core.PreviewConfig;
 import androidx.camera.core.UseCase;
 import androidx.core.app.ActivityCompat;
-
 import android.Manifest;
 import android.content.Context;
-import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -38,38 +36,25 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
-
 import android.util.Log;
 import android.util.Size;
 import android.view.Gravity;
 import android.view.WindowManager;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Stack;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-
-import com.github.anastr.speedviewlib.SpeedView;
 import com.github.anastr.speedviewlib.TubeSpeedometer;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
@@ -115,11 +100,7 @@ public class MainActivity extends AppCompatActivity {
 
     ArrayList<String> detected = new ArrayList<String>();
 
-    private void initRecyclerView(){
-        recyclerView = findViewById(R.id.my_recycler_view);
-        RecyclerViewAdapter adapter = new RecyclerViewAdapter(detected,this);
-        recyclerView.setAdapter(adapter);
-    }
+
 
 
     private final HashMap<Integer, Detection> detectedSpeedLimits = new HashMap<Integer, Detection>();
@@ -129,7 +110,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initRecyclerView();
         detected.add("Hello WOrld");
         detected.add("Hello ");
 
@@ -159,7 +139,6 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(intent);
                 }
             });
-
             //if no - bring user to selecting Static Location Activity
             builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
                 @Override
@@ -182,17 +161,20 @@ public class MainActivity extends AppCompatActivity {
         speedometer = (TubeSpeedometer) findViewById(R.id.speedView);
         speedometer.setMaxSpeed(200f);
 
+        recyclerView = findViewById(R.id.rv_detections);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        RecyclerViewAdapter adapter = new RecyclerViewAdapter(detected,this);
+        recyclerView.setAdapter(adapter);
+
         final String format = "Thresh: %.2f, NMS: %.2f";
         thresholdTextview.setText(String.format(Locale.ENGLISH, format, threshold, nms_threshold));
 
         // ML-Kit Text Recognizer
         recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
-
         new SpeedTask(this).execute("string");
 
         resultImageView.setOnClickListener(v -> detectPhoto.set(false));
         startCamera();
-
     }
 
 
@@ -210,7 +192,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
     private UseCase gainAnalyzer(DetectAnalyzer detectAnalyzer) {
         ImageAnalysisConfig.Builder analysisConfigBuilder = new ImageAnalysisConfig.Builder();
         analysisConfigBuilder.setImageReaderMode(ImageAnalysis.ImageReaderMode.ACQUIRE_LATEST_IMAGE);
@@ -219,29 +200,6 @@ public class MainActivity extends AppCompatActivity {
         ImageAnalysis analysis = new ImageAnalysis(config);
         analysis.setAnalyzer(detectAnalyzer);
         return analysis;
-    }
-
-
-    public void popupMessage(String text) {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setMessage(text);
-        alertDialogBuilder.setTitle("Detected Object");
-        alertDialogBuilder.setNegativeButton("ok", new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-
-
-            }
-        });
-
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        WindowManager.LayoutParams wmlp = alertDialog.getWindow().getAttributes();
-        wmlp.gravity = Gravity.TOP | Gravity.LEFT;
-        wmlp.x = 100;   //x position
-        wmlp.y = 100;   //y position
-
-        alertDialog.show();
     }
 
     private class DetectAnalyzer implements ImageAnalysis.Analyzer {
@@ -382,16 +340,13 @@ public class MainActivity extends AppCompatActivity {
 
             return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
         }
-
     }
-
 
     @Override
     protected void onDestroy() {
         CameraX.unbindAll();
         super.onDestroy();
     }
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -534,7 +489,6 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onLocationChanged(Location location) {
                     speed = location.getSpeed();
-                    Log.i("SPEED", "onLocationChanged: " + speed);
                     localspeed = speed * 3.6f;
                     filtSpeed = filter(filtSpeed, localspeed, 2);
                     speedometer.speedTo(filtSpeed);

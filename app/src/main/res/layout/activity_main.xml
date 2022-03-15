@@ -40,7 +40,7 @@
         app:layout_constraintTop_toBottomOf="@+id/valTxtView" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/my_recycler_view"
+        android:id="@+id/rv_detections"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@+id/valTxtView"
