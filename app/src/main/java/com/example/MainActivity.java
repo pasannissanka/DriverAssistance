@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
 
     private TextRecognizer recognizer;
 
-    ArrayList<String> detected = new ArrayList<>();
+    ArrayList<Detection> detected = new ArrayList<>();
     ArrayList<String> test = new ArrayList<>();
 
     private final HashMap<Integer, Detection> detectedSpeedLimits = new HashMap<Integer, Detection>();
@@ -300,7 +300,7 @@ public class MainActivity extends AppCompatActivity {
                         canvas.drawText("id: " + box.getId(), box.x1 - strokeWidth, box.y1 - strokeWidth, boxPaint);
                         boxPaint.setStyle(Paint.Style.STROKE);
                         canvas.drawRect(box.getRect(), boxPaint);
-                        detected.add(box.getLabel());
+                        detected.add(new Detection(box.getLabel(),box.getId()));
                         Log.d("detected",detected.toString());
                     }
                 } catch (Exception e) {
