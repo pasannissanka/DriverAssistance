@@ -17,7 +17,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     private static final String TAG = "RecyclerViewAdapter";
 
-    private ArrayList<String> titles = new ArrayList<String>();
+    private ArrayList<String> titles;
     private Context mContext;
 
     public RecyclerViewAdapter(ArrayList<String> titles, Context mContext) {
@@ -39,6 +39,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
         holder.textView.setText(titles.get(position));
     }
+
+
 
     @Override
     public int getItemCount() {
