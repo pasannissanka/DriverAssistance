@@ -16,6 +16,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -83,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView detectedObjectView;
     private TubeSpeedometer speedometer;
     private TextView tvSpeedLimit;
-    private Button button;
+    private Button button,exitBtn;
 
     private final double threshold = 0.35;
     private final double nms_threshold = 0.7;
@@ -116,6 +117,8 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().hide();
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         mainActivity = this;
 
@@ -159,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
         tvInfo = findViewById(R.id.tv_info);
         tvSpeedLimit = findViewById(R.id.tvSpeedLimit);
         button = findViewById(R.id.my_btn);
-
+        exitBtn = findViewById(R.id.exit_btn);
         speedometer = (TubeSpeedometer) findViewById(R.id.speedView);
         speedometer.setMaxSpeed(200f);
 
@@ -176,6 +179,13 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 detected.clear();
                 adapter.notifyDataSetChanged();
+            }
+        });
+
+        exitBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                System.exit(0);
             }
         });
 
