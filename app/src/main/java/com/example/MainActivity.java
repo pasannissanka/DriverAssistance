@@ -21,6 +21,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.Paint;
@@ -108,8 +109,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        detected.add("Hello WOrld");
-        detected.add("Hello ");
+//        detected.add("Hello WOrld");
+//        detected.add("Hello ");
 
         getSupportActionBar().hide();
 
@@ -235,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
 
                 try {
                     for (Box box : result) {
-                        boxPaint.setColor(box.getColor());
+                        boxPaint.setColor(Color.argb(255, 50, 205, 50));
                         boxPaint.setStyle(Paint.Style.FILL);
                         String score = Integer.toString((int) (box.getScore() * 100));
 

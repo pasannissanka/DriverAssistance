@@ -79,7 +79,6 @@
         android:id="@+id/tvSpeedLimit"
         android:layout_width="54dp"
         android:layout_height="53dp"
-        android:text="50"
         android:textAlignment="center"
         android:textSize="34sp"
         app:layout_constraintBottom_toBottomOf="@+id/imageView3"
