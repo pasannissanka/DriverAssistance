@@ -17,11 +17,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     private static final String TAG = "RecyclerViewAdapter";
 
-    private ArrayList<String> titles = new ArrayList<String>();
+    private ArrayList<Detection> detections;
     private Context mContext;
 
-    public RecyclerViewAdapter(ArrayList<String> titles, Context mContext) {
-        this.titles = titles;
+    public RecyclerViewAdapter(ArrayList<Detection> detections, Context mContext) {
+        this.detections = detections;
         this.mContext = mContext;
     }
 
@@ -37,12 +37,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Log.d(TAG, "onBindViewHolder: called");
 
-        holder.textView.setText(titles.get(position));
+        holder.textView.setText(detections.get(position).getLabelName());
     }
+
+
 
     @Override
     public int getItemCount() {
-        return titles.size();
+        return detections.size();
     }
 
     public class  ViewHolder extends RecyclerView.ViewHolder{

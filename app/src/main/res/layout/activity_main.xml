@@ -3,8 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     tools:context=".MainActivity">
+
 
     <ImageView
         android:id="@+id/imageView"
@@ -19,37 +20,90 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@android:color/background_light" />
 
-    <TextView
-        android:id="@+id/valTxtView"
+
+    <LinearLayout
+        android:id="@+id/linearLayout2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
-        android:layout_marginTop="5dp"
-        android:text="Thresh:x.xx,NMS:x.xx"
-        app:layout_constraintStart_toStartOf="@+id/tv_info"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
-
-    <TextView
-        android:id="@+id/tv_info"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="0dp"
-        android:text="000x000 FPS:x.xxx"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/valTxtView" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_detections"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@+id/valTxtView"
+        android:layout_marginTop="12dp"
+        android:orientation="vertical"
+        android:padding="5px"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.023"
+        app:layout_constraintHorizontal_bias="0.952"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/valTxtView"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Thresh:x.xx,NMS:x.xx"
+            android:textColor="#66ff00" />
+
+        <TextView
+            android:id="@+id/tv_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:layout_marginTop="20px"
+            android:text="000x000 FPS:x.xxx"
+            android:textColor="#66ff00" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="20px"
+        android:paddingBottom="20px"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.072"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.296" />
+        app:layout_constraintVertical_bias="0.322">
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_detections"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toTopOf="@+id/valTxtView" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="5px"
+        app:layout_constraintBottom_toTopOf="@+id/speedView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.819"
+        app:layout_constraintStart_toEndOf="@+id/linearLayout"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout2"
+        app:layout_constraintVertical_bias="0.537">
+
+        <Button
+            android:id="@+id/my_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Clear"
+            android:textColor="#FF0000"
+            tools:layout_editor_absoluteX="536dp"
+            tools:layout_editor_absoluteY="93dp" />
+
+        <Button
+            android:id="@+id/exit_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Exit"
+            android:textColor="#FF0000"
+            tools:layout_editor_absoluteX="536dp"
+            tools:layout_editor_absoluteY="156dp" />
+
+    </LinearLayout>
 
     <com.github.anastr.speedviewlib.TubeSpeedometer
         android:id="@+id/speedView"

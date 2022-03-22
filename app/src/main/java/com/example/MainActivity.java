@@ -16,6 +16,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -40,7 +41,9 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.util.Size;
 import android.view.Gravity;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -82,11 +85,13 @@ public class MainActivity extends AppCompatActivity {
     private TextView detectedObjectView;
     private TubeSpeedometer speedometer;
     private TextView tvSpeedLimit;
+    private Button button,exitBtn;
 
     private final double threshold = 0.35;
     private final double nms_threshold = 0.7;
 
     private RecyclerView recyclerView;
+    private RecyclerViewAdapter adapter;
 
     private final AtomicBoolean detecting = new AtomicBoolean(false);
     private final AtomicBoolean detectPhoto = new AtomicBoolean(false);
@@ -99,8 +104,8 @@ public class MainActivity extends AppCompatActivity {
 
     private TextRecognizer recognizer;
 
-    ArrayList<String> detected = new ArrayList<String>();
-
+    ArrayList<Detection> detected = new ArrayList<>();
+    ArrayList<String> test = new ArrayList<>();
 
     private final HashMap<Integer, Detection> detectedSpeedLimits = new HashMap<Integer, Detection>();
     private final Stack<Detection> detectedSpeedLimitsStack = new Stack<>();
@@ -113,6 +118,10 @@ public class MainActivity extends AppCompatActivity {
 //        detected.add("Hello ");
 
         getSupportActionBar().hide();
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         mainActivity = this;
 
@@ -155,17 +164,33 @@ public class MainActivity extends AppCompatActivity {
         thresholdTextview = findViewById(R.id.valTxtView);
         tvInfo = findViewById(R.id.tv_info);
         tvSpeedLimit = findViewById(R.id.tvSpeedLimit);
-
+        button = findViewById(R.id.my_btn);
+        exitBtn = findViewById(R.id.exit_btn);
         speedometer = (TubeSpeedometer) findViewById(R.id.speedView);
         speedometer.setMaxSpeed(200f);
 
         recyclerView = findViewById(R.id.rv_detections);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        RecyclerViewAdapter adapter = new RecyclerViewAdapter(detected,this);
+        adapter = new RecyclerViewAdapter(detected,this);
         recyclerView.setAdapter(adapter);
-
+        recyclerView.hasFixedSize();
         final String format = "Thresh: %.2f, NMS: %.2f";
         thresholdTextview.setText(String.format(Locale.ENGLISH, format, threshold, nms_threshold));
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                detected.clear();
+                adapter.notifyDataSetChanged();
+            }
+        });
+
+        exitBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                System.exit(0);
+            }
+        });
 
         // ML-Kit Text Recognizer
         recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
@@ -290,7 +315,8 @@ public class MainActivity extends AppCompatActivity {
                         canvas.drawText("id: " + box.getId(), box.x1 - strokeWidth, box.y1 - strokeWidth, boxPaint);
                         boxPaint.setStyle(Paint.Style.STROKE);
                         canvas.drawRect(box.getRect(), boxPaint);
-                        detected.add(box.getLabel());
+                        detected.add(new Detection(box.getLabel(),box.getId()));
+                        Log.d("detected",detected.toString());
                     }
                 } catch (Exception e) {
                     Log.e(LOG, e.toString());
@@ -309,6 +335,11 @@ public class MainActivity extends AppCompatActivity {
                         Detection newDetection = detectedSpeedLimitsStack.pop();
                         tvSpeedLimit.setText(newDetection.getSpeed().replaceAll("[^0-9]", ""));
                     }
+                    adapter.notifyDataSetChanged();
+                    if(detected.size()>0){
+                        recyclerView.scrollToPosition(detected.size()-1);
+                    }
+
                 });
             }, "detect");
             detectThread.start();
