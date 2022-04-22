@@ -205,8 +205,8 @@ public class MainActivity extends AppCompatActivity {
         exitBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, PopUp.class));
-//                System.exit(0);
+//                startActivity(new Intent(MainActivity.this, PopUp.class));
+                System.exit(0);
             }
         });
 
@@ -327,7 +327,7 @@ public class MainActivity extends AppCompatActivity {
                             // Wait for OCR to finish
                             Tasks.await(recognizerResult);
                         } else if (!"other".equals(box.getLabel()))  {
-                            Detection det = new Detection(box.getLabel(), box.getId());
+                            Detection det = new Detection(box.getLabelId(), box.getId());
 
                             final Debouncer debouncer = new Debouncer();
                             debouncer.debounce(Void.class, new Runnable() {
@@ -335,7 +335,7 @@ public class MainActivity extends AppCompatActivity {
                                 public void run() {
                                     if (detectedSignsStack.empty()) {
                                         detectedSignsStack.push(det);
-                                    } else if (!detectedSignsStack.peek().getLabelName().contentEquals(det.getLabelName())) {
+                                    } else if (detectedSignsStack.peek().getLabel() != det.getLabel()) {
                                         detectedSignsStack.push(det);
                                     }
                                 }
