@@ -44,6 +44,26 @@ Java_com_example_YOLOv4_detect(JNIEnv *env, jclass, jobject image, jdouble thres
     jobjectArray ret = env->NewObjectArray(result.size(), box_cls, nullptr);
     int i = 0;
 
+//    for (auto &trk: tracks) {
+//        if (trk.second.coast_cycles_ < kMaxCoastCycles && (trk.second.hit_streak_ >= kMinHits)) {
+//            const auto &bbox = trk.second.GetStateAsBbox();
+//            env->PushLocalFrame(1);
+//            jobject obj = env->NewObject(
+//                    box_cls,
+//                    cid,
+//                    (float) bbox.x,                // x0
+//                    (float) bbox.y,                // y0
+//                    (float) bbox.width + bbox.x,   // x1
+//                    (float) bbox.height + bbox.y,  // y1
+//                    trk.second.label,              // label
+//                    (float) trk.second.score,      // score
+//                    trk.first                      // id
+//            );
+//            obj = env->PopLocalFrame(obj);
+//            env->SetObjectArrayElement(ret, i++, obj);
+//        }
+//    }
+
     for (auto &trk: tracks) {
         if (trk.second.coast_cycles_ < kMaxCoastCycles && (trk.second.hit_streak_ >= kMinHits)) {
             const auto &bbox = trk.second.GetStateAsBbox();
@@ -64,21 +84,5 @@ Java_com_example_YOLOv4_detect(JNIEnv *env, jclass, jobject image, jdouble thres
         }
 
     }
-
-//    for (auto &box:result) {
-//        env->PushLocalFrame(1);
-//        jobject obj = env->NewObject(box_cls,
-//                                     cid,
-//                                     (float) box.box.x,
-//                                     (float) box.box.y,
-//                                     (float) box.box.width + box.box.x,
-//                                     (float) box.box.height + box.box.y,
-//                                     box.label,
-//                                     box.score,
-//                                     0,
-//                                     box.id);
-//        obj = env->PopLocalFrame(obj);
-//        env->SetObjectArrayElement(ret, i++, obj);
-//    }
     return ret;
 }

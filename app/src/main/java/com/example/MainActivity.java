@@ -12,15 +12,19 @@ import androidx.camera.core.Preview;
 import androidx.camera.core.PreviewConfig;
 import androidx.camera.core.UseCase;
 import androidx.core.app.ActivityCompat;
+
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.Paint;
@@ -39,13 +43,21 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.util.Size;
 import android.view.Gravity;
+import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -54,7 +66,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Stack;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+
 import com.github.anastr.speedviewlib.TubeSpeedometer;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
@@ -75,17 +89,18 @@ public class MainActivity extends AppCompatActivity {
             Manifest.permission.ACCESS_FINE_LOCATION
     };
     private ImageView resultImageView;
-
     private TextView thresholdTextview;
     private TextView tvInfo;
-    private TextView detectedObjectView;
+
     private TubeSpeedometer speedometer;
     private TextView tvSpeedLimit;
+    private Button button, exitBtn;
 
     private final double threshold = 0.35;
     private final double nms_threshold = 0.7;
 
     private RecyclerView recyclerView;
+    private RecyclerViewAdapter adapter;
 
     private final AtomicBoolean detecting = new AtomicBoolean(false);
     private final AtomicBoolean detectPhoto = new AtomicBoolean(false);
@@ -98,20 +113,25 @@ public class MainActivity extends AppCompatActivity {
 
     private TextRecognizer recognizer;
 
-    ArrayList<String> detected = new ArrayList<String>();
-
+    ArrayList<Detection> detected = new ArrayList<>();
+    ArrayList<String> test = new ArrayList<>();
 
     private final HashMap<Integer, Detection> detectedSpeedLimits = new HashMap<Integer, Detection>();
     private final Stack<Detection> detectedSpeedLimitsStack = new Stack<>();
+
+    private float speedLimit = 50.0f;
+
+    private final Stack<Detection> detectedSignsStack = new Stack<>();
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        detected.add("Hello WOrld");
-        detected.add("Hello ");
-
-        getSupportActionBar().hide();
+        hideSystemBars();
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         mainActivity = this;
 
@@ -148,23 +168,47 @@ public class MainActivity extends AppCompatActivity {
         }
 
         setContentView(R.layout.activity_main);
+
+        getSupportActionBar().hide();
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
         YOLOv4.init(getAssets());
 
         resultImageView = findViewById(R.id.imageView);
         thresholdTextview = findViewById(R.id.valTxtView);
         tvInfo = findViewById(R.id.tv_info);
         tvSpeedLimit = findViewById(R.id.tvSpeedLimit);
-
+        button = findViewById(R.id.my_btn);
+        exitBtn = findViewById(R.id.exit_btn);
         speedometer = (TubeSpeedometer) findViewById(R.id.speedView);
         speedometer.setMaxSpeed(200f);
-
         recyclerView = findViewById(R.id.rv_detections);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        RecyclerViewAdapter adapter = new RecyclerViewAdapter(detected,this);
+        adapter = new RecyclerViewAdapter(detectedSignsStack, this);
         recyclerView.setAdapter(adapter);
+        recyclerView.hasFixedSize();
 
         final String format = "Thresh: %.2f, NMS: %.2f";
         thresholdTextview.setText(String.format(Locale.ENGLISH, format, threshold, nms_threshold));
+        // Default speed set to 50 KMPH
+        tvSpeedLimit.setText(String.valueOf((int) speedLimit));
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("NotifyDataSetChanged")
+            @Override
+            public void onClick(View view) {
+                detected.clear();
+                adapter.notifyDataSetChanged();
+            }
+        });
+
+        exitBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                startActivity(new Intent(MainActivity.this, PopUp.class));
+                System.exit(0);
+            }
+        });
 
         // ML-Kit Text Recognizer
         recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
@@ -211,7 +255,7 @@ public class MainActivity extends AppCompatActivity {
             final Bitmap bitmapSrc = imageToBitmap(image);  // Format Conversion
 
             // Detection Thread
-            Thread detectThread = new Thread(() -> {
+            @SuppressLint("NotifyDataSetChanged") Thread detectThread = new Thread(() -> {
                 Matrix matrix = new Matrix();
                 matrix.postRotate(rotationDegrees);
                 width = bitmapSrc.getWidth();
@@ -235,7 +279,7 @@ public class MainActivity extends AppCompatActivity {
 
                 try {
                     for (Box box : result) {
-                        boxPaint.setColor(box.getColor());
+                        boxPaint.setColor(Color.argb(255, 50, 205, 50));
                         boxPaint.setStyle(Paint.Style.FILL);
                         String score = Integer.toString((int) (box.getScore() * 100));
 
@@ -267,6 +311,7 @@ public class MainActivity extends AppCompatActivity {
                                         label[0] = resultText;
                                         if (detectedSpeedLimits.containsKey(box.getId())) {
                                             Detection det = detectedSpeedLimits.get(box.getId());
+                                            assert det != null;
                                             String lastText = det.getSpeed().replaceAll("[^0-9]", "");
                                             det.setSpeed(resultText);
                                             detectedSpeedLimits.replace(box.getId(), det);
@@ -281,6 +326,20 @@ public class MainActivity extends AppCompatActivity {
                                     });
                             // Wait for OCR to finish
                             Tasks.await(recognizerResult);
+                        } else if (!"other".equals(box.getLabel()))  {
+                            Detection det = new Detection(box.getLabelId(), box.getId());
+
+                            final Debouncer debouncer = new Debouncer();
+                            debouncer.debounce(Void.class, new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (detectedSignsStack.empty()) {
+                                        detectedSignsStack.push(det);
+                                    } else if (detectedSignsStack.peek().getLabel() != det.getLabel()) {
+                                        detectedSignsStack.push(det);
+                                    }
+                                }
+                            }, 500, TimeUnit.MILLISECONDS);
                         }
                         // Set Bounding Boxes and Labels
                         canvas.drawText(label[0] + " [" + score + "%]",
@@ -289,7 +348,6 @@ public class MainActivity extends AppCompatActivity {
                         canvas.drawText("id: " + box.getId(), box.x1 - strokeWidth, box.y1 - strokeWidth, boxPaint);
                         boxPaint.setStyle(Paint.Style.STROKE);
                         canvas.drawRect(box.getRect(), boxPaint);
-                        detected.add(box.getLabel());
                     }
                 } catch (Exception e) {
                     Log.e(LOG, e.toString());
@@ -299,14 +357,22 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     resultImageView.setImageBitmap(mutableBitmap);
                     detecting.set(false);
+
                     long dur = endTime - startTime;
                     float fps = (float) (1000.0 / dur);
                     tvInfo.setText(String.format(Locale.ENGLISH,
                             "ImgSize: %dx%d\nUseTime: %d ms\nDetectFPS: %.2f",
                             height, width, dur, fps));
+
                     if (!detectedSpeedLimitsStack.empty()) {
                         Detection newDetection = detectedSpeedLimitsStack.pop();
                         tvSpeedLimit.setText(newDetection.getSpeed().replaceAll("[^0-9]", ""));
+                        speedLimit = Float.parseFloat(newDetection.getSpeed().replaceAll("[^0-9]", ""));
+                    }
+
+                    adapter.notifyDataSetChanged();
+                    if (!detectedSignsStack.empty()) {
+                        recyclerView.scrollToPosition(detectedSignsStack.size() - 1);
                     }
                 });
             }, "detect");
@@ -462,7 +528,22 @@ public class MainActivity extends AppCompatActivity {
         return returnBm;
     }
 
+    private void hideSystemBars() {
+        WindowInsetsControllerCompat windowInsetsController =
+                ViewCompat.getWindowInsetsController(getWindow().getDecorView());
+        if (windowInsetsController == null) {
+            return;
+        }
+        // Configure the behavior of the hidden system bars
+        windowInsetsController.setSystemBarsBehavior(
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        );
+        // Hide both the status bar and the navigation bar
+        windowInsetsController.hide(WindowInsetsCompat.Type.systemBars());
+    }
+
     // Get speed by Location Manager
+    @SuppressLint("StaticFieldLeak")
     private class SpeedTask extends AsyncTask<String, Void, String> {
         final MainActivity mainActivity;
         float speed = 0.0f;
@@ -482,6 +563,7 @@ public class MainActivity extends AppCompatActivity {
             LocationListener listener = new LocationListener() {
                 float filtSpeed;
                 float localspeed;
+                boolean highSpeed;
 
                 @Override
                 public void onLocationChanged(Location location) {
@@ -489,6 +571,18 @@ public class MainActivity extends AppCompatActivity {
                     localspeed = speed * 3.6f;
                     filtSpeed = filter(filtSpeed, localspeed, 2);
                     speedometer.speedTo(filtSpeed);
+
+                    Context context = getApplicationContext();
+                    if (filtSpeed > speedLimit && speedLimit != 0.0f && !highSpeed) {
+                        highSpeed = true;
+//                        Toast.makeText(context, "Over speed limit", Toast.LENGTH_LONG).show();
+                        Intent popUpIntent = new Intent(MainActivity.this, PopUp.class);
+                        startActivityIfNeeded(popUpIntent, 1);
+
+                    } else if (filtSpeed < speedLimit){
+                        highSpeed = false;
+                        finishActivity(1);
+                    }
                 }
 
                 @Override
