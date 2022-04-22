@@ -6,6 +6,7 @@ public class Detection {
     private final int id;
     private String speed;
 
+
     Detection(int label, int id) {
         this.id = id;
         this.label = label;
