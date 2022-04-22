@@ -17,10 +17,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".PopUp"
-            android:exported="false"
-            android:theme="@style/AppTheme.PopUpCustom"/>
-        <activity
             android:name=".MainActivity"
             android:configChanges="orientation"
             android:keepScreenOn="true"
@@ -31,6 +27,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".PopUp"
+            android:exported="false"
+            android:theme="@style/AppTheme.PopUpCustom"
+            android:parentActivityName=".MainActivity"/>
     </application>
 
 </manifest>

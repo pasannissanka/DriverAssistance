@@ -575,9 +575,13 @@ public class MainActivity extends AppCompatActivity {
                     Context context = getApplicationContext();
                     if (filtSpeed > speedLimit && speedLimit != 0.0f && !highSpeed) {
                         highSpeed = true;
-                        Toast.makeText(context, "Over speed limit", Toast.LENGTH_LONG).show();
-                    } else {
+//                        Toast.makeText(context, "Over speed limit", Toast.LENGTH_LONG).show();
+                        Intent popUpIntent = new Intent(MainActivity.this, PopUp.class);
+                        startActivityIfNeeded(popUpIntent, 1);
+
+                    } else if (filtSpeed < speedLimit){
                         highSpeed = false;
+                        finishActivity(1);
                     }
                 }
 
