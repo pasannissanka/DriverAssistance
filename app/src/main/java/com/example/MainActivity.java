@@ -18,6 +18,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -55,16 +56,17 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -89,49 +91,48 @@ public class MainActivity extends AppCompatActivity {
             Manifest.permission.ACCESS_FINE_LOCATION
     };
     private ImageView resultImageView;
-    private TextView thresholdTextview;
     private TextView tvInfo;
-
     private TubeSpeedometer speedometer;
     private TextView tvSpeedLimit;
-    private Button button, exitBtn;
-
-    private final double threshold = 0.35;
-    private final double nms_threshold = 0.7;
-
     private RecyclerView recyclerView;
     private RecyclerViewAdapter adapter;
+    private TextRecognizer recognizer;
 
+    // Config values
+    private double threshold;
+    private double nms_threshold;
+    private int kMinHits;
+    private final AtomicBoolean detectorView = new AtomicBoolean(true);
+    private final AtomicBoolean modelMetricsShow = new AtomicBoolean(true);
+    private float speedLimit = 50.0f;
+
+    // state variables
     private final AtomicBoolean detecting = new AtomicBoolean(false);
     private final AtomicBoolean detectPhoto = new AtomicBoolean(false);
 
+    // Model metrics
     private long startTime = 0;
     private long endTime = 0;
     private int width;
     private int height;
     private static final Paint boxPaint = new Paint();
 
-    private TextRecognizer recognizer;
-
-    ArrayList<Detection> detected = new ArrayList<>();
-    ArrayList<String> test = new ArrayList<>();
-
+    // Detections
     private final HashMap<Integer, Detection> detectedSpeedLimits = new HashMap<Integer, Detection>();
     private final Stack<Detection> detectedSpeedLimitsStack = new Stack<>();
-
-    private float speedLimit = 50.0f;
-
     private final Stack<Detection> detectedSignsStack = new Stack<>();
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         hideSystemBars();
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+        getWindow().setFlags(
+                WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        Objects.requireNonNull(getSupportActionBar()).hide();
 
         mainActivity = this;
 
@@ -169,17 +170,30 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        getSupportActionBar().hide();
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        // Get preference values
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        // App settings
+        detectorView.set(sharedPref.getBoolean(SettingsActivity.KEY_APP_PREF_BOOL_DETECTION, true));
+        modelMetricsShow.set(sharedPref.getBoolean(SettingsActivity.KEY_APP_PREF_BOOL_METRICS, true));
+        speedLimit = Float.parseFloat(sharedPref.getString(SettingsActivity.KEY_APP_PREF_STRING_DEF_SPEED, "50"));
+        // Model parameters
+        threshold = Double.parseDouble(sharedPref.getString(SettingsActivity.KEY_MODEL_PREF_DOUBLE_THRESHOLD, "0.35"));
+        nms_threshold = Double.parseDouble(sharedPref.getString(SettingsActivity.KEY_MODEL_PREF_DOUBLE_NMS_THRESHOLD, "0.7"));
+        kMinHits = Integer.parseInt(sharedPref.getString(SettingsActivity.KEY_MODEL_PREF_DOUBLE_K_MIN_HITS, "3"));
 
         YOLOv4.init(getAssets());
 
         resultImageView = findViewById(R.id.imageView);
-        thresholdTextview = findViewById(R.id.valTxtView);
+        TextView thresholdTextview = findViewById(R.id.valTxtView);
         tvInfo = findViewById(R.id.tv_info);
         tvSpeedLimit = findViewById(R.id.tvSpeedLimit);
-        button = findViewById(R.id.my_btn);
-        exitBtn = findViewById(R.id.exit_btn);
+
+        Button button = findViewById(R.id.my_btn);
+        Button exitBtn = findViewById(R.id.exit_btn);
+        Button settingsBtn = findViewById(R.id.btn_settings);
+
         speedometer = (TubeSpeedometer) findViewById(R.id.speedView);
         speedometer.setMaxSpeed(200f);
         recyclerView = findViewById(R.id.rv_detections);
@@ -188,16 +202,24 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
         recyclerView.hasFixedSize();
 
-        final String format = "Thresh: %.2f, NMS: %.2f";
-        thresholdTextview.setText(String.format(Locale.ENGLISH, format, threshold, nms_threshold));
-        // Default speed set to 50 KMPH
+        if (modelMetricsShow.get()) {
+            tvInfo.setVisibility(View.VISIBLE);
+            final String format = "Thresh: %.2f, NMS: %.2f";
+            thresholdTextview.setVisibility(View.VISIBLE);
+            thresholdTextview.setText(String.format(Locale.ENGLISH, format, threshold, nms_threshold));
+        } else {
+            tvInfo.setVisibility(View.INVISIBLE);
+            thresholdTextview.setVisibility(View.INVISIBLE);
+        }
+
+        // Default speed limit
         tvSpeedLimit.setText(String.valueOf((int) speedLimit));
 
         button.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onClick(View view) {
-                detected.clear();
+                detectedSignsStack.clear();
                 adapter.notifyDataSetChanged();
             }
         });
@@ -207,6 +229,13 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
 //                startActivity(new Intent(MainActivity.this, PopUp.class));
                 System.exit(0);
+            }
+        });
+
+        settingsBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MainActivity.this, SettingsActivity.class));
             }
         });
 
@@ -263,24 +292,12 @@ public class MainActivity extends AppCompatActivity {
                 Bitmap bitmap = Bitmap.createBitmap(bitmapSrc, 0, 0, width, height, matrix, false);
 
                 startTime = System.currentTimeMillis();
-                Box[] result = YOLOv4.detect(bitmap, threshold, nms_threshold);
+                Box[] result = YOLOv4.detect(bitmap, threshold, nms_threshold, kMinHits);
                 endTime = System.currentTimeMillis();
 
                 final Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
-                float strokeWidth = 4 * (float) mutableBitmap.getWidth() / 800;
-                float textSize = 30 * (float) mutableBitmap.getWidth() / 800;
-
-                Canvas canvas = new Canvas(mutableBitmap);
-                boxPaint.setAlpha(255);
-                boxPaint.setTypeface(Typeface.SANS_SERIF);
-                boxPaint.setStyle(Paint.Style.STROKE);
-                boxPaint.setStrokeWidth(strokeWidth);
-                boxPaint.setTextSize(textSize);
-
                 try {
                     for (Box box : result) {
-                        boxPaint.setColor(Color.argb(255, 50, 205, 50));
-                        boxPaint.setStyle(Paint.Style.FILL);
                         String score = Integer.toString((int) (box.getScore() * 100));
 
                         final String[] label = {""};
@@ -326,7 +343,7 @@ public class MainActivity extends AppCompatActivity {
                                     });
                             // Wait for OCR to finish
                             Tasks.await(recognizerResult);
-                        } else if (!"other".equals(box.getLabel()))  {
+                        } else if (!"other".equals(box.getLabel())) {
                             Detection det = new Detection(box.getLabelId(), box.getId());
 
                             final Debouncer debouncer = new Debouncer();
@@ -341,35 +358,55 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             }, 500, TimeUnit.MILLISECONDS);
                         }
-                        // Set Bounding Boxes and Labels
-                        canvas.drawText(label[0] + " [" + score + "%]",
-                                box.x0 - strokeWidth, box.y0 - strokeWidth
-                                , boxPaint);
-                        canvas.drawText("id: " + box.getId(), box.x1 - strokeWidth, box.y1 - strokeWidth, boxPaint);
-                        boxPaint.setStyle(Paint.Style.STROKE);
-                        canvas.drawRect(box.getRect(), boxPaint);
+                        if (detectorView.get()) {
+                            Canvas canvas = new Canvas(mutableBitmap);
+                            float strokeWidth = 4 * (float) mutableBitmap.getWidth() / 800;
+                            float textSize = 30 * (float) mutableBitmap.getWidth() / 800;
+
+                            boxPaint.setAlpha(255);
+                            boxPaint.setTypeface(Typeface.SANS_SERIF);
+                            boxPaint.setStyle(Paint.Style.STROKE);
+                            boxPaint.setStrokeWidth(strokeWidth);
+                            boxPaint.setTextSize(textSize);
+                            boxPaint.setColor(Color.argb(255, 50, 205, 50));
+                            boxPaint.setStyle(Paint.Style.FILL);
+
+                            // Set Bounding Boxes and Labels
+                            canvas.drawText(label[0] + " [" + score + "%]",
+                                    box.x0 - strokeWidth, box.y0 - strokeWidth
+                                    , boxPaint);
+                            canvas.drawText("id: " + box.getId(), box.x1 - strokeWidth, box.y1 - strokeWidth, boxPaint);
+                            boxPaint.setStyle(Paint.Style.STROKE);
+                            canvas.drawRect(box.getRect(), boxPaint);
+                        }
                     }
                 } catch (Exception e) {
                     Log.e(LOG, e.toString());
                 }
-
                 // Run UI Drawing on UI Thread
                 runOnUiThread(() -> {
-                    resultImageView.setImageBitmap(mutableBitmap);
+                    // image view
+                    if (detectorView.get()) {
+                        resultImageView.setImageBitmap(mutableBitmap);
+                    } else {
+                        resultImageView.setImageBitmap(bitmapSrc);
+                    }
                     detecting.set(false);
-
-                    long dur = endTime - startTime;
-                    float fps = (float) (1000.0 / dur);
-                    tvInfo.setText(String.format(Locale.ENGLISH,
-                            "ImgSize: %dx%d\nUseTime: %d ms\nDetectFPS: %.2f",
-                            height, width, dur, fps));
-
+                    // modal inference details
+                    if (modelMetricsShow.get()) {
+                        long dur = endTime - startTime;
+                        float fps = (float) (1000.0 / dur);
+                        tvInfo.setText(String.format(Locale.ENGLISH,
+                                "ImgSize: %dx%d\nUseTime: %d ms\nDetectFPS: %.2f",
+                                height, width, dur, fps));
+                    }
+                    // speed limit
                     if (!detectedSpeedLimitsStack.empty()) {
                         Detection newDetection = detectedSpeedLimitsStack.pop();
                         tvSpeedLimit.setText(newDetection.getSpeed().replaceAll("[^0-9]", ""));
                         speedLimit = Float.parseFloat(newDetection.getSpeed().replaceAll("[^0-9]", ""));
                     }
-
+                    // signs
                     adapter.notifyDataSetChanged();
                     if (!detectedSignsStack.empty()) {
                         recyclerView.scrollToPosition(detectedSignsStack.size() - 1);
@@ -430,7 +467,7 @@ public class MainActivity extends AppCompatActivity {
         detectPhoto.set(true);
         Bitmap image = getPicture(data.getData());
         startTime = System.currentTimeMillis();
-        Box[] result = YOLOv4.detect(image, threshold, nms_threshold);
+        Box[] result = YOLOv4.detect(image, threshold, nms_threshold, kMinHits);
         endTime = System.currentTimeMillis();
 
         final Bitmap mutableBitmap = image.copy(Bitmap.Config.ARGB_8888, true);
@@ -572,14 +609,14 @@ public class MainActivity extends AppCompatActivity {
                     filtSpeed = filter(filtSpeed, localspeed, 2);
                     speedometer.speedTo(filtSpeed);
 
-                    Context context = getApplicationContext();
                     if (filtSpeed > speedLimit && speedLimit != 0.0f && !highSpeed) {
                         highSpeed = true;
 //                        Toast.makeText(context, "Over speed limit", Toast.LENGTH_LONG).show();
                         Intent popUpIntent = new Intent(MainActivity.this, PopUp.class);
+                        popUpIntent.putExtra("speed", speedLimit);
                         startActivityIfNeeded(popUpIntent, 1);
 
-                    } else if (filtSpeed < speedLimit){
+                    } else if (filtSpeed < speedLimit) {
                         highSpeed = false;
                         finishActivity(1);
                     }

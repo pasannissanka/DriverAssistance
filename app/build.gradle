@@ -23,7 +23,7 @@ android {
         }
         ndk {
             //根据需要 自行选择添加的对应cpu类型的.so库。
-            abiFilters 'arm64-v8a', 'x86_64' , 'x86'
+            abiFilters 'arm64-v8a', 'x86_64' , 'x86', 'armeabi-v7a'
         }
     }
     buildTypes {
@@ -47,6 +47,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'com.google.android.material:material:1.4.0'
+    implementation 'androidx.preference:preference:1.1.1'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'

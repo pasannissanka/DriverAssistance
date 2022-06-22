@@ -1,0 +1,55 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="@string/app_header">
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="cbp_detection"
+            android:summaryOff="@string/detection_summery_off"
+            android:summaryOn="@string/detection_summery_on"
+            android:title="@string/detection_title" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="cbp_metrics"
+            android:summaryOff="@string/metrics_summery_off"
+            android:summaryOn="@string/metrics_summery_on"
+            android:title="@string/metrics_title" />
+
+        <ListPreference
+            app:defaultValue="50"
+            app:entries="@array/speed_limit_entries"
+            app:entryValues="@array/speed_limit_values"
+            app:key="lp_default_speed_limit"
+            app:title="@string/default_speed_limit"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/model_header">
+
+        <EditTextPreference
+            android:defaultValue="0.35"
+            android:inputType="numberDecimal"
+            app:key="etp_threshold"
+            app:title="@string/threshold"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            android:defaultValue="0.7"
+            android:inputType="numberDecimal"
+            app:key="etp_nms_threshold"
+            app:title="@string/nms_threshold"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            android:defaultValue="2"
+            android:inputType="number"
+            app:key="etp_k_min_hits"
+            app:title="@string/k_min_hits"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

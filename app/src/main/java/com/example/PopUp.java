@@ -2,8 +2,10 @@ package com.example;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.widget.TextView;
 
 import java.util.Objects;
 
@@ -23,5 +25,11 @@ public class PopUp extends AppCompatActivity {
 
         // Set layout to 50% of width and 80% height of parent activity
         getWindow().setLayout((int)(w * .5), (int)(h * .8));
+
+        Intent intent = getIntent();
+        float limit = intent.getFloatExtra("speed", 50.0f);
+
+        TextView tvSpeedLimit = findViewById(R.id.popup_tv_speed_limit);
+        tvSpeedLimit.setText(String.valueOf((int) limit));
     }
 }

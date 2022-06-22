@@ -9,5 +9,5 @@ public class YOLOv4 {
     }
 
     public static native void init(AssetManager manager);
-    public static native Box[] detect(Bitmap bitmap, double threshold, double nms_threshold);
+    public static native Box[] detect(Bitmap bitmap, double threshold, double nms_threshold, int kMinHits);
 }

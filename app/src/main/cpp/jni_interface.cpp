@@ -32,7 +32,7 @@ Java_com_example_YOLOv4_init(JNIEnv *env, jclass, jobject assetManager) {
 
 extern "C" JNIEXPORT jobjectArray JNICALL
 Java_com_example_YOLOv4_detect(JNIEnv *env, jclass, jobject image, jdouble threshold,
-                               jdouble nms_threshold) {
+                               jdouble nms_threshold, jint k_min_hits) {
 
     auto result = yolov4::detector->detect(env, image, threshold, nms_threshold);
 
@@ -65,7 +65,7 @@ Java_com_example_YOLOv4_detect(JNIEnv *env, jclass, jobject image, jdouble thres
 //    }
 
     for (auto &trk: tracks) {
-        if (trk.second.coast_cycles_ < kMaxCoastCycles && (trk.second.hit_streak_ >= kMinHits)) {
+        if (trk.second.coast_cycles_ < kMaxCoastCycles && (trk.second.hit_streak_ >= k_min_hits)) {
             const auto &bbox = trk.second.GetStateAsBbox();
             env->PushLocalFrame(1);
             jobject obj = env->NewObject(
