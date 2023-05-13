@@ -2,11 +2,11 @@ package com.example;
 
 public class Detection {
     private final int label;
-    private final int id;
+//    private final int id;
     private String speed;
 
-    Detection(int label, int id) {
-        this.id = id;
+    Detection(int label) {
+//        this.id = id;
         this.label = label;
         this.speed = "";
     }
@@ -15,9 +15,9 @@ public class Detection {
         return label;
     }
 
-    public int getId() {
-        return id;
-    }
+//    public int getId() {
+//        return id;
+//    }
 
     public String getSpeed() {
         return speed;

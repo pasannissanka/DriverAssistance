@@ -307,9 +307,7 @@ public class MainActivity extends AppCompatActivity {
                         if ("speed limit".equals(box.getLabel())) {
                             RectF rect = box.getRect();
 
-                            if (!detectedSpeedLimits.containsKey(box.getId())) {
-                                detectedSpeedLimits.put(box.getId(), new Detection(box.getLabelId(), box.getId()));
-                            }
+                            Log.i("DETECTION", "LABEL: [" + box.getLabel() + "]");
 
                             // Crop speed limit Bounding box
                             assert (rect.left < rect.right && rect.top < rect.bottom);
@@ -326,25 +324,39 @@ public class MainActivity extends AppCompatActivity {
                                         // Task completed successfully
                                         String resultText = processTextRecognitionResult(visionText);
                                         label[0] = resultText;
-                                        if (detectedSpeedLimits.containsKey(box.getId())) {
-                                            Detection det = detectedSpeedLimits.get(box.getId());
-                                            assert det != null;
-                                            String lastText = det.getSpeed().replaceAll("[^0-9]", "");
-                                            det.setSpeed(resultText);
-                                            detectedSpeedLimits.replace(box.getId(), det);
-                                            if (!lastText.equals(resultText.replaceAll("[^0-9]", ""))) {
+                                        if (!resultText.replaceAll("[^0-9]", "").isEmpty()) {
+                                            int speed = Integer.parseInt(resultText.replaceAll("[^0-9]", ""));
+
+                                            Log.i("OCR", "RESULT: [" + resultText + "] , SPEED: [" + speed + "]");
+
+                                            if (detectedSpeedLimits.containsKey(speed)) {
+                                                Detection det = detectedSpeedLimits.get(speed);
+                                                assert det != null;
+                                                String lastText = det.getSpeed().replaceAll("[^0-9]", "");
+                                                det.setSpeed(resultText);
+                                                detectedSpeedLimits.replace(speed, det);
+                                                if (!lastText.equals(resultText.replaceAll("[^0-9]", ""))) {
+                                                    detectedSpeedLimitsStack.push(det);
+                                                }
+                                            } else {
+                                                Detection det = new Detection(box.getLabelId());
+                                                det.setSpeed(resultText);
+                                                detectedSpeedLimits.put(speed, det);
                                                 detectedSpeedLimitsStack.push(det);
                                             }
+
                                         }
                                     })
                                     .addOnFailureListener(e -> {
                                         // Task failed with an exception
-                                        Log.e(LOG + "OCR", e.toString());
+                                        Log.e(LOG, "OCR" + e.toString());
                                     });
                             // Wait for OCR to finish
                             Tasks.await(recognizerResult);
                         } else if (!"other".equals(box.getLabel())) {
-                            Detection det = new Detection(box.getLabelId(), box.getId());
+                            Detection det = new Detection(box.getLabelId());
+
+                            Log.i("DETECTION", "LABEL: [" + det.getLabel() + "]");
 
                             final Debouncer debouncer = new Debouncer();
                             debouncer.debounce(Void.class, new Runnable() {
@@ -375,7 +387,7 @@ public class MainActivity extends AppCompatActivity {
                             canvas.drawText(label[0] + " [" + score + "%]",
                                     box.x0 - strokeWidth, box.y0 - strokeWidth
                                     , boxPaint);
-                            canvas.drawText("id: " + box.getId(), box.x1 - strokeWidth, box.y1 - strokeWidth, boxPaint);
+//                            canvas.drawText("id: ", box.x1 - strokeWidth, box.y1 - strokeWidth, boxPaint);
                             boxPaint.setStyle(Paint.Style.STROKE);
                             canvas.drawRect(box.getRect(), boxPaint);
                         }
