@@ -353,7 +353,7 @@ public class MainActivity extends AppCompatActivity {
                                     });
                             // Wait for OCR to finish
                             Tasks.await(recognizerResult);
-                        } else if (!"other".equals(box.getLabel())) {
+                        } else {
                             Detection det = new Detection(box.getLabelId());
 
                             Log.i("DETECTION", "LABEL: [" + det.getLabel() + "]");

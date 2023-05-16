@@ -40,7 +40,7 @@ yolov4::detect(JNIEnv *env, jobject image, float threshold, float nms_threshold)
     ex.extract("output", blob);
     auto boxes = decode_infer(blob, {(int) img_size.width, (int) img_size.height}, threshold);
     result.insert(result.begin(), boxes.begin(), boxes.end());
-//    nms(result, nms_threshold);
+    nms(result, nms_threshold);
     return result;
 }
 /**

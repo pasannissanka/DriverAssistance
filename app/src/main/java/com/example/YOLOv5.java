@@ -3,7 +3,7 @@ package com.example;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 
-public class YOLOv4 {
+public class YOLOv5 {
     static {
         System.loadLibrary("detector");
     }
