@@ -17,4 +17,18 @@
         <item>70</item>
         <item>100</item>
     </string-array>
+
+    <string-array name="detection_model_entries">
+        <item>YOLOv5n pretrained on TT100k</item>
+        <item>YOLOv5n</item>
+        <item>YOLOv4 tiny pretrained on TT100k</item>
+        <item>YOLOv4 tiny</item>
+    </string-array>
+
+    <string-array name="detection_model_values">
+        <item>YOLO_V5_N_PRETRAINED</item>
+        <item>YOLO_V5_N</item>
+        <item>YOLO_V4_TINY_PRETRAINED</item>
+        <item>YOLO_V4_TINY</item>
+    </string-array>
 </resources>

@@ -8,6 +8,6 @@ public class YOLOv5 {
         System.loadLibrary("detector");
     }
 
-    public static native void init(AssetManager manager);
+    public static native void init(AssetManager manager, String param, String bin);
     public static native Box[] detect(Bitmap bitmap, double threshold, double nms_threshold, int kMinHits);
 }

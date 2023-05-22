@@ -105,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
     private final AtomicBoolean detectorView = new AtomicBoolean(true);
     private final AtomicBoolean modelMetricsShow = new AtomicBoolean(true);
     private float speedLimit = 50.0f;
+    private final Detector DETECTOR = new Detector();
 
     // state variables
     private final AtomicBoolean detecting = new AtomicBoolean(false);
@@ -178,12 +179,16 @@ public class MainActivity extends AppCompatActivity {
         detectorView.set(sharedPref.getBoolean(SettingsActivity.KEY_APP_PREF_BOOL_DETECTION, true));
         modelMetricsShow.set(sharedPref.getBoolean(SettingsActivity.KEY_APP_PREF_BOOL_METRICS, true));
         speedLimit = Float.parseFloat(sharedPref.getString(SettingsActivity.KEY_APP_PREF_STRING_DEF_SPEED, "50"));
+        Detector.MODEL selectedModel = Detector.MODEL.valueOf(sharedPref.getString(SettingsActivity.KEY_APP_PREF_STRING_DETECTION_MODEL, "YOLO_V4_TINY"));
+        DETECTOR.setSelectedModel(selectedModel);
+
         // Model parameters
         threshold = Double.parseDouble(sharedPref.getString(SettingsActivity.KEY_MODEL_PREF_DOUBLE_THRESHOLD, "0.35"));
         nms_threshold = Double.parseDouble(sharedPref.getString(SettingsActivity.KEY_MODEL_PREF_DOUBLE_NMS_THRESHOLD, "0.7"));
         kMinHits = Integer.parseInt(sharedPref.getString(SettingsActivity.KEY_MODEL_PREF_DOUBLE_K_MIN_HITS, "3"));
 
-        YOLOv4.init(getAssets());
+//        YOLOv4.init(getAssets(), "", "");
+        DETECTOR.init(getAssets());
 
         resultImageView = findViewById(R.id.imageView);
         TextView thresholdTextview = findViewById(R.id.valTxtView);
@@ -204,9 +209,9 @@ public class MainActivity extends AppCompatActivity {
 
         if (modelMetricsShow.get()) {
             tvInfo.setVisibility(View.VISIBLE);
-            final String format = "Thresh: %.2f, NMS: %.2f";
+            final String format = "Thresh: %.2f, NMS: %.2f, Model: %s";
             thresholdTextview.setVisibility(View.VISIBLE);
-            thresholdTextview.setText(String.format(Locale.ENGLISH, format, threshold, nms_threshold));
+            thresholdTextview.setText(String.format(Locale.ENGLISH, format, threshold, nms_threshold, DETECTOR.getModelName()));
         } else {
             tvInfo.setVisibility(View.INVISIBLE);
             thresholdTextview.setVisibility(View.INVISIBLE);
@@ -284,7 +289,8 @@ public class MainActivity extends AppCompatActivity {
             final Bitmap bitmapSrc = imageToBitmap(image);  // Format Conversion
 
             // Detection Thread
-            @SuppressLint("NotifyDataSetChanged") Thread detectThread = new Thread(() -> {
+            @SuppressLint("NotifyDataSetChanged")
+            Thread detectThread = new Thread(() -> {
                 Matrix matrix = new Matrix();
                 matrix.postRotate(rotationDegrees);
                 width = bitmapSrc.getWidth();
@@ -292,7 +298,8 @@ public class MainActivity extends AppCompatActivity {
                 Bitmap bitmap = Bitmap.createBitmap(bitmapSrc, 0, 0, width, height, matrix, false);
 
                 startTime = System.currentTimeMillis();
-                Box[] result = YOLOv4.detect(bitmap, threshold, nms_threshold, kMinHits);
+//                Box[] result = YOLOv4.detect(bitmap, threshold, nms_threshold, kMinHits);
+                Box[] result = DETECTOR.detect(bitmap, threshold, nms_threshold, kMinHits);
                 endTime = System.currentTimeMillis();
 
                 final Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
@@ -479,7 +486,8 @@ public class MainActivity extends AppCompatActivity {
         detectPhoto.set(true);
         Bitmap image = getPicture(data.getData());
         startTime = System.currentTimeMillis();
-        Box[] result = YOLOv4.detect(image, threshold, nms_threshold, kMinHits);
+//        Box[] result = YOLOv4.detect(image, threshold, nms_threshold, kMinHits);
+        Box[] result = DETECTOR.detect(image, threshold, nms_threshold, kMinHits);
         endTime = System.currentTimeMillis();
 
         final Bitmap mutableBitmap = image.copy(Bitmap.Config.ARGB_8888, true);

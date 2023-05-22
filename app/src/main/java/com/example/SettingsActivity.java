@@ -16,9 +16,11 @@ public class SettingsActivity extends AppCompatActivity {
     public static final String KEY_APP_PREF_BOOL_DETECTION = "cbp_detection";
     public static final String KEY_APP_PREF_STRING_DEF_SPEED = "lp_default_speed_limit";
     public static final String KEY_APP_PREF_BOOL_METRICS = "cbp_metrics";
+    public static final String KEY_APP_PREF_STRING_DETECTION_MODEL = "lp_detection_model";
     public static final String KEY_MODEL_PREF_DOUBLE_THRESHOLD = "etp_threshold";
     public static final String KEY_MODEL_PREF_DOUBLE_NMS_THRESHOLD = "etp_nms_threshold";
     public static final String KEY_MODEL_PREF_DOUBLE_K_MIN_HITS = "etp_k_min_hits";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

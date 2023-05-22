@@ -19,11 +19,12 @@ JNIEXPORT void JNI_OnUnload(JavaVM *vm, void *reserved) {
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_example_YOLOv4_init(JNIEnv *env, jclass, jobject assetManager) {
+Java_com_example_YOLOv4_init(JNIEnv *env, jclass, jobject assetManager, jstring param, jstring bin) {
     if (yolov4::detector == nullptr) {
         AAssetManager *mgr = AAssetManager_fromJava(env, assetManager);
-        yolov4::detector = new yolov4(mgr, "custom-yolov4-tiny-detector_opt.param",
-                                      "custom-yolov4-tiny-detector_opt.bin", false);
+        const char *model_param = env->GetStringUTFChars(param, nullptr);
+        const char *model_bin = env->GetStringUTFChars(bin, nullptr);
+        yolov4::detector = new yolov4(mgr, model_param,model_bin, false);
     }
 }
 
@@ -60,12 +61,13 @@ Java_com_example_YOLOv4_detect(JNIEnv *env, jclass, jobject image, jdouble thres
 }
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_example_YOLOv5_init(JNIEnv *env, jclass clazz, jobject assetManager) {
+Java_com_example_YOLOv5_init(JNIEnv *env, jclass clazz, jobject assetManager, jstring param, jstring bin) {
     // TODO: implement init()
     if (yolov5::yolov5_detector == nullptr) {
         AAssetManager *mgr = AAssetManager_fromJava(env, assetManager);
-        yolov5::yolov5_detector = new yolov5(mgr, "custom-yolov4-tiny-detector_opt.param",
-                                      "custom-yolov4-tiny-detector_opt.bin", false);
+        const char *model_param = env->GetStringUTFChars(param, nullptr);
+        const char *model_bin = env->GetStringUTFChars(bin, nullptr);
+        yolov5::yolov5_detector = new yolov5(mgr, model_param,model_bin, false);
     }
 }
 extern "C"

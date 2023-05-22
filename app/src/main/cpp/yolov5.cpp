@@ -4,6 +4,8 @@
 
 #include "include/yolov5.h"
 
+
+
 yolov5 *yolov5::yolov5_detector = nullptr;
 
 yolov5::yolov5(AAssetManager *mgr, const char *param, const char *bin, bool useGPU) {
@@ -12,10 +14,24 @@ yolov5::yolov5(AAssetManager *mgr, const char *param, const char *bin, bool useG
 
     Net = new ncnn::Net();
     Net->opt.use_vulkan_compute = yolov4::toUseGPU;  // GPU
+    Net->opt.lightmode = true;
+    Net->opt.num_threads = 4;
+    Net->opt.use_packing_layout = true;
 
-    Net->load_param(mgr, param);
-    Net->load_model(mgr, bin);
+//    Net->register_custom_layer("YoloV5Focus", YoloV5Focus_layer_creator);
 
+    {
+        int ret = Net->load_param(mgr, param);
+        if (ret != 0) {
+            __android_log_print(ANDROID_LOG_DEBUG, "YOLOV5", "load parmas failed");
+        }
+    }
+    {
+        int ret = Net->load_model(mgr, bin);
+        if (ret != 0) {
+            __android_log_print(ANDROID_LOG_DEBUG, "YOLOV5", "load model failed");
+        }
+    }
 }
 
 yolov5::~yolov5() {
@@ -27,8 +43,9 @@ float yolov5::sigmoid(float x) {
 }
 
 
-void yolov5::generate_proposals(const ncnn::Mat& anchors, int stride, const ncnn::Mat& in_pad, const ncnn::Mat& feat_blob, float prob_threshold, std::vector<BoxInfo>& objects)
-{
+void yolov5::generate_proposals(const ncnn::Mat &anchors, int stride, const ncnn::Mat &in_pad,
+                                const ncnn::Mat &feat_blob, float prob_threshold,
+                                std::vector<BoxInfo> &objects) {
     const int num_grid = feat_blob.h;
 
     int num_grid_x;
@@ -60,56 +77,56 @@ void yolov5::generate_proposals(const ncnn::Mat& anchors, int stride, const ncnn
             for (int j = 0; j < num_grid_x; j++)
             {
                 const float* featptr = feat.row(i * num_grid_x + j);
-                float box_confidence =  yolov5::sigmoid(featptr[4]);
-                if (box_confidence >= prob_threshold)
+
+                // find class index with max class score
+                int class_index = 0;
+                float class_score = -FLT_MAX;
+                for (int k = 0; k < num_class; k++)
                 {
-                    // find class index with max class score
-                    int class_index = 0;
-                    float class_score = -FLT_MAX;
-                    for (int k = 0; k < num_class; k++)
+                    float score = featptr[5 + k];
+                    if (score > class_score)
                     {
-                        float score = featptr[5 + k];
-                        if (score > class_score)
-                        {
-                            class_index = k;
-                            class_score = score;
-                        }
+                        class_index = k;
+                        class_score = score;
                     }
-                    float confidence = box_confidence * sigmoid(class_score);
-                    if (confidence >= prob_threshold)
-                    {
-                        // yolov5/models/yolo.py Detect forward
-                        // y = x[i].sigmoid()
-                        // y[..., 0:2] = (y[..., 0:2] * 2. - 0.5 + self.grid[i].to(x[i].device)) * self.stride[i]  # xy
-                        // y[..., 2:4] = (y[..., 2:4] * 2) ** 2 * self.anchor_grid[i]  # wh
+                }
 
-                        float dx = sigmoid(featptr[0]);
-                        float dy = sigmoid(featptr[1]);
-                        float dw = sigmoid(featptr[2]);
-                        float dh = sigmoid(featptr[3]);
+                float box_score = featptr[4];
 
-                        float pb_cx = (dx * 2.f - 0.5f + j) * stride;
-                        float pb_cy = (dy * 2.f - 0.5f + i) * stride;
+                float confidence = sigmoid(box_score) * sigmoid(class_score);
 
-                        float pb_w = pow(dw * 2.f, 2) * anchor_w;
-                        float pb_h = pow(dh * 2.f, 2) * anchor_h;
+                if (confidence >= prob_threshold)
+                {
+                    // yolov5/models/yolo.py Detect forward
+                    // y = x[i].sigmoid()
+                    // y[..., 0:2] = (y[..., 0:2] * 2. - 0.5 + self.grid[i].to(x[i].device)) * self.stride[i]  # xy
+                    // y[..., 2:4] = (y[..., 2:4] * 2) ** 2 * self.anchor_grid[i]  # wh
 
-                        float x0 = pb_cx - pb_w * 0.5f;
-                        float y0 = pb_cy - pb_h * 0.5f;
-                        float x1 = pb_cx + pb_w * 0.5f;
-                        float y1 = pb_cy + pb_h * 0.5f;
+                    float dx = sigmoid(featptr[0]);
+                    float dy = sigmoid(featptr[1]);
+                    float dw = sigmoid(featptr[2]);
+                    float dh = sigmoid(featptr[3]);
 
-                        BoxInfo obj;
+                    float pb_cx = (dx * 2.f - 0.5f + j) * stride;
+                    float pb_cy = (dy * 2.f - 0.5f + i) * stride;
 
-                        obj.box.x = x0;
-                        obj.box.y = y0;
-                        obj.box.width = x1 - x0;
-                        obj.box.height = y1 - y0;
-                        obj.label = class_index;
-                        obj.score = confidence;
+                    float pb_w = pow(dw * 2.f, 2) * anchor_w;
+                    float pb_h = pow(dh * 2.f, 2) * anchor_h;
 
-                        objects.push_back(obj);
-                    }
+                    float x0 = pb_cx - pb_w * 0.5f;
+                    float y0 = pb_cy - pb_h * 0.5f;
+                    float x1 = pb_cx + pb_w * 0.5f;
+                    float y1 = pb_cy + pb_h * 0.5f;
+
+                    BoxInfo obj;
+                    obj.box.x = x0;
+                    obj.box.y = y0;
+                    obj.box.width = x1 - x0;
+                    obj.box.height = y1 - y0;
+                    obj.label = class_index;
+                    obj.score = confidence;
+
+                    objects.push_back(obj);
                 }
             }
         }
@@ -118,22 +135,20 @@ void yolov5::generate_proposals(const ncnn::Mat& anchors, int stride, const ncnn
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "openmp-use-default-none"
-void yolov5::qsort_descent_inplace(std::vector<BoxInfo>& faceobjects, int left, int right)
-{
+
+void yolov5::qsort_descent_inplace(std::vector<BoxInfo> &faceobjects, int left, int right) {
     int i = left;
     int j = right;
     float p = faceobjects[(left + right) / 2].score;
 
-    while (i <= j)
-    {
+    while (i <= j) {
         while (faceobjects[i].score > p)
             i++;
 
         while (faceobjects[j].score < p)
             j--;
 
-        if (i <= j)
-        {
+        if (i <= j) {
             // swap
             std::swap(faceobjects[i], faceobjects[j]);
 
@@ -154,42 +169,38 @@ void yolov5::qsort_descent_inplace(std::vector<BoxInfo>& faceobjects, int left, 
         }
     }
 }
+
 #pragma clang diagnostic pop
 
-void yolov5::qsort_descent_inplace(std::vector<BoxInfo>& faceobjects)
-{
+void yolov5::qsort_descent_inplace(std::vector<BoxInfo> &faceobjects) {
     if (faceobjects.empty())
         return;
 
     qsort_descent_inplace(faceobjects, 0, faceobjects.size() - 1);
 }
 
-inline float yolov5::intersection_area(const BoxInfo & a, const BoxInfo & b)
-{
+inline float yolov5::intersection_area(const BoxInfo &a, const BoxInfo &b) {
     cv::Rect_<float> inter = a.box & b.box;
     return inter.area();
 }
 
-void yolov5::nms_sorted_bboxes(const std::vector<BoxInfo>& faceobjects, std::vector<int>& picked, float nms_threshold, bool agnostic)
-{
+void yolov5::nms_sorted_bboxes(const std::vector<BoxInfo> &faceobjects, std::vector<int> &picked,
+                               float nms_threshold, bool agnostic) {
     picked.clear();
 
     const int n = faceobjects.size();
 
     std::vector<float> areas(n);
-    for (int i = 0; i < n; i++)
-    {
+    for (int i = 0; i < n; i++) {
         areas[i] = faceobjects[i].box.area();
     }
 
-    for (int i = 0; i < n; i++)
-    {
-        const BoxInfo & a = faceobjects[i];
+    for (int i = 0; i < n; i++) {
+        const BoxInfo &a = faceobjects[i];
 
         int keep = 1;
-        for (int j = 0; j < (int)picked.size(); j++)
-        {
-            const BoxInfo & b = faceobjects[picked[j]];
+        for (int j = 0; j < (int) picked.size(); j++) {
+            const BoxInfo &b = faceobjects[picked[j]];
 
             if (!agnostic && a.label != b.label)
                 continue;
@@ -210,37 +221,40 @@ void yolov5::nms_sorted_bboxes(const std::vector<BoxInfo>& faceobjects, std::vec
 
 std::vector<BoxInfo>
 yolov5::detect(JNIEnv *env, jobject image, float threshold, float nms_threshold) {
-    AndroidBitmapInfo img_size;
-    AndroidBitmap_getInfo(env, image, &img_size);
 
-    int img_w = img_size.width;
-    int img_h = img_size.height;
+    AndroidBitmapInfo info;
+    AndroidBitmap_getInfo(env, image, &info);
+    const int width = info.width;
+    const int height = info.height;
+//    if (info.format != ANDROID_BITMAP_FORMAT_RGBA_8888)
+//        return NULL;
 
-    // letterbox pad to multiple of MAX_STRIDE
-    int w = img_w;
-    int h = img_h;
+    // ncnn from bitmap
+    const int targetSize = 640;
+
+    // letterbox pad to multiple of 32
+    int w = width;
+    int h = height;
     float scale = 1.f;
     if (w > h)
     {
-        scale = (float)target_size / w;
-        w = target_size;
+        scale = (float)targetSize / w;
+        w = targetSize;
         h = h * scale;
     }
     else
     {
-        scale = (float)target_size / h;
-        h = target_size;
+        scale = (float)targetSize / h;
+        h = targetSize;
         w = w * scale;
     }
 
-    ncnn::Mat in_net = ncnn::Mat::from_android_bitmap_resize(env, image, ncnn::Mat::PIXEL_RGBA2RGB,
-                                                             target_size,
-                                                             target_size);
+    ncnn::Mat in_net = ncnn::Mat::from_android_bitmap_resize(env, image, ncnn::Mat::PIXEL_RGB,w,h);
+
     // pad to target_size rectangle
     // yolov5/utils/datasets.py letterbox
-    int wpad = (w + MAX_STRIDE - 1) / MAX_STRIDE * MAX_STRIDE - w;
-    int hpad = (h + MAX_STRIDE - 1) / MAX_STRIDE * MAX_STRIDE - h;
-
+    int wpad = (w + 31) / 32 * 32 - w;
+    int hpad = (h + 31) / 32 * 32 - h;
     ncnn::Mat in_pad;
     ncnn::copy_make_border(in_net, in_pad, hpad / 2, hpad - hpad / 2, wpad / 2, wpad - wpad / 2, ncnn::BORDER_CONSTANT, 114.f);
 
@@ -257,7 +271,7 @@ yolov5::detect(JNIEnv *env, jobject image, float threshold, float nms_threshold)
     // stride 8
     {
         ncnn::Mat out;
-        ex.extract("output", out);
+        ex.extract("/model.24/Transpose_output_0", out);
 
         ncnn::Mat anchors(6);
         anchors[0] = 10.f;
@@ -268,16 +282,16 @@ yolov5::detect(JNIEnv *env, jobject image, float threshold, float nms_threshold)
         anchors[5] = 23.f;
 
         std::vector<BoxInfo> objects8;
-        generate_proposals(anchors, 8, in_pad, out, threshold, objects8);
+        yolov5::generate_proposals(anchors, 8, in_pad, out, threshold, objects8);
 
         proposals.insert(proposals.end(), objects8.begin(), objects8.end());
     }
-    // stride 16
+//     stride 16
     {
         ncnn::Mat out;
 
 #if YOLOV5_V62
-        ex.extract("353", out);
+        ex.extract("/model.24/Transpose_1_output_0", out);
 #elif YOLOV5_V60
         ex.extract("376", out);
 #else
@@ -293,15 +307,15 @@ yolov5::detect(JNIEnv *env, jobject image, float threshold, float nms_threshold)
         anchors[5] = 119.f;
 
         std::vector<BoxInfo> objects16;
-        generate_proposals(anchors, 16, in_pad, out, threshold, objects16);
+        yolov5::generate_proposals(anchors, 16, in_pad, out, threshold, objects16);
 
         proposals.insert(proposals.end(), objects16.begin(), objects16.end());
     }
-    // stride 32
+//     stride 32
     {
         ncnn::Mat out;
 #if YOLOV5_V62
-        ex.extract("367", out);
+        ex.extract("/model.24/Transpose_2_output_0", out);
 #elif YOLOV5_V60
         ex.extract("401", out);
 #else
@@ -316,16 +330,21 @@ yolov5::detect(JNIEnv *env, jobject image, float threshold, float nms_threshold)
         anchors[5] = 326.f;
 
         std::vector<BoxInfo> objects32;
-        generate_proposals(anchors, 32, in_pad, out, threshold, objects32);
+        yolov5::generate_proposals(anchors, 32, in_pad, out, threshold, objects32);
 
         proposals.insert(proposals.end(), objects32.begin(), objects32.end());
     }
+    __android_log_print(ANDROID_LOG_DEBUG, "YOLOV5_1",
+                        "%s", reinterpret_cast<const char *>(proposals.size()));
     // sort all proposals by score from highest to lowest
     qsort_descent_inplace(proposals);
 
     // apply nms with nms_threshold
     std::vector<int> picked;
     nms_sorted_bboxes(proposals, picked, nms_threshold);
+
+    __android_log_print(ANDROID_LOG_DEBUG, "YOLOV5",
+                        "%s", reinterpret_cast<const char *>(proposals.size()));
 
     return proposals;
 }

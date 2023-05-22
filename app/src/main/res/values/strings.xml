@@ -20,6 +20,7 @@
     <string name="metrics_summery_on">Model inference metrics will be drawn</string>
     <string name="metrics_summery_off">Model inference metrics will not be drawn</string>
     <string name="default_speed_limit">Default Speed Limit</string>
+    <string name="detection_model">Select Detection model</string>
     <string name="reply_title">Default reply action</string>
 
     <!-- Sync Preferences -->

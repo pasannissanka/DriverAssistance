@@ -25,6 +25,14 @@
             app:title="@string/default_speed_limit"
             app:useSimpleSummaryProvider="true" />
 
+        <ListPreference
+            app:defaultValue="YOLO_V5_N"
+            app:entries="@array/detection_model_entries"
+            app:entryValues="@array/detection_model_values"
+            app:key="lp_detection_model"
+            app:title="@string/detection_model"
+            app:useSimpleSummaryProvider="true" />
+
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/model_header">
