@@ -1,4 +1,4 @@
-package com.example;
+package com.pasannissanka;
 
 import android.graphics.Color;
 import android.graphics.RectF;

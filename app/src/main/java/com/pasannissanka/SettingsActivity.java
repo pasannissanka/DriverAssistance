@@ -1,4 +1,4 @@
-package com.example;
+package com.pasannissanka;
 
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;

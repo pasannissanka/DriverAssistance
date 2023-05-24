@@ -1,4 +1,4 @@
-package com.example;
+package com.pasannissanka;
 
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;

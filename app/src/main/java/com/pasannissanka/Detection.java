@@ -1,4 +1,4 @@
-package com.example;
+package com.pasannissanka;
 
 public class Detection {
     private final int label;

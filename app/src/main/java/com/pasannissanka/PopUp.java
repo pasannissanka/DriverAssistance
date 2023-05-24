@@ -1,4 +1,4 @@
-package com.example;
+package com.pasannissanka;
 
 import androidx.appcompat.app.AppCompatActivity;
 

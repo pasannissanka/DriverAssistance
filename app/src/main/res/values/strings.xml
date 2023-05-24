@@ -1,6 +1,5 @@
 <resources>
-    <string name="app_name">Driver Assistance</string>
-    <string name="copyright1">Model trained by AlexeyAB/darknet,which implement the YOLOv4-tiny algorithm.</string>
+    <string name="app_name">Traffic Sign Detection</string>
     <string name="copyright2">Model converted and deployed by Tencent/NCNN.</string>
     <string name="gps_not_found_message">This app requires GPS or Location Service.\n\nWould you like to enable Location Service now?\n</string>
     <string name="gps_not_found_title">GPS Not Enabled</string>

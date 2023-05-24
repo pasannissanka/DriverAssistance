@@ -19,7 +19,7 @@ JNIEXPORT void JNI_OnUnload(JavaVM *vm, void *reserved) {
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_example_YOLOv4_init(JNIEnv *env, jclass, jobject assetManager, jstring param, jstring bin) {
+Java_com_pasannissanka_YOLOv4_init(JNIEnv *env, jclass, jobject assetManager, jstring param, jstring bin) {
     if (yolov4::detector == nullptr) {
         AAssetManager *mgr = AAssetManager_fromJava(env, assetManager);
         const char *model_param = env->GetStringUTFChars(param, nullptr);
@@ -29,12 +29,12 @@ Java_com_example_YOLOv4_init(JNIEnv *env, jclass, jobject assetManager, jstring 
 }
 
 extern "C" JNIEXPORT jobjectArray JNICALL
-Java_com_example_YOLOv4_detect(JNIEnv *env, jclass, jobject image, jdouble threshold,
+Java_com_pasannissanka_YOLOv4_detect(JNIEnv *env, jclass, jobject image, jdouble threshold,
                                jdouble nms_threshold, jint k_min_hits) {
 
     auto result = yolov4::detector->detect(env, image, threshold, nms_threshold);
 
-    auto box_cls = env->FindClass("com/example/Box");
+    auto box_cls = env->FindClass("com/pasannissanka/Box");
     auto cid = env->GetMethodID(box_cls, "<init>", "(FFFFIFI)V");
     jobjectArray ret = env->NewObjectArray(result.size(), box_cls, nullptr);
     int i = 0;
@@ -61,7 +61,7 @@ Java_com_example_YOLOv4_detect(JNIEnv *env, jclass, jobject image, jdouble thres
 }
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_example_YOLOv5_init(JNIEnv *env, jclass clazz, jobject assetManager, jstring param, jstring bin) {
+Java_com_pasannissanka_YOLOv5_init(JNIEnv *env, jclass clazz, jobject assetManager, jstring param, jstring bin) {
     // TODO: implement init()
     if (yolov5::yolov5_detector == nullptr) {
         AAssetManager *mgr = AAssetManager_fromJava(env, assetManager);
@@ -72,11 +72,11 @@ Java_com_example_YOLOv5_init(JNIEnv *env, jclass clazz, jobject assetManager, js
 }
 extern "C"
 JNIEXPORT jobjectArray JNICALL
-Java_com_example_YOLOv5_detect(JNIEnv *env, jclass, jobject image, jdouble threshold,
+Java_com_pasannissanka_YOLOv5_detect(JNIEnv *env, jclass, jobject image, jdouble threshold,
                                jdouble nms_threshold, jint k_min_hits) {
     auto result = yolov5::yolov5_detector->detect(env, image, threshold, nms_threshold);
 
-    auto box_cls = env->FindClass("com/example/Box");
+    auto box_cls = env->FindClass("com/pasannissanka/Box");
     auto cid = env->GetMethodID(box_cls, "<init>", "(FFFFIFI)V");
     jobjectArray ret = env->NewObjectArray(result.size(), box_cls, nullptr);
     int i = 0;
