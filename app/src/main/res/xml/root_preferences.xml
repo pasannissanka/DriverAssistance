@@ -26,7 +26,7 @@
             app:useSimpleSummaryProvider="true" />
 
         <ListPreference
-            app:defaultValue="YOLO_V5_N"
+            app:defaultValue="YOLO_V4_TINY_1"
             app:entries="@array/detection_model_entries"
             app:entryValues="@array/detection_model_values"
             app:key="lp_detection_model"

@@ -2,11 +2,9 @@ package com.pasannissanka;
 
 public class Detection {
     private final int label;
-//    private final int id;
     private String speed;
 
     Detection(int label) {
-//        this.id = id;
         this.label = label;
         this.speed = "";
     }
@@ -14,10 +12,6 @@ public class Detection {
     public int getLabel() {
         return label;
     }
-
-//    public int getId() {
-//        return id;
-//    }
 
     public String getSpeed() {
         return speed;

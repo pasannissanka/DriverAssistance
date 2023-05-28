@@ -19,16 +19,12 @@
     </string-array>
 
     <string-array name="detection_model_entries">
-        <item>YOLOv5n pretrained on TT100k</item>
-        <item>YOLOv5n</item>
-        <item>YOLOv4 tiny pretrained on TT100k</item>
-        <item>YOLOv4 tiny</item>
+        <item>YOLOv4 tiny 1</item>
+        <item>YOLOv4 tiny 2</item>
     </string-array>
 
     <string-array name="detection_model_values">
-        <item>YOLO_V5_N_PRETRAINED</item>
-        <item>YOLO_V5_N</item>
-        <item>YOLO_V4_TINY_PRETRAINED</item>
-        <item>YOLO_V4_TINY</item>
+        <item>YOLO_V4_TINY_1</item>
+        <item>YOLO_V4_TINY_2</item>
     </string-array>
 </resources>

@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
     private final AtomicBoolean detectorView = new AtomicBoolean(true);
     private final AtomicBoolean modelMetricsShow = new AtomicBoolean(true);
     private float speedLimit = 50.0f;
-    private final Detector DETECTOR = new Detector();
+    private final Detector DETECTOR = Detector.getInstance();
 
     // state variables
     private final AtomicBoolean detecting = new AtomicBoolean(false);
@@ -178,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
         detectorView.set(sharedPref.getBoolean(SettingsActivity.KEY_APP_PREF_BOOL_DETECTION, true));
         modelMetricsShow.set(sharedPref.getBoolean(SettingsActivity.KEY_APP_PREF_BOOL_METRICS, true));
         speedLimit = Float.parseFloat(sharedPref.getString(SettingsActivity.KEY_APP_PREF_STRING_DEF_SPEED, "50"));
-        Detector.MODEL selectedModel = Detector.MODEL.valueOf(sharedPref.getString(SettingsActivity.KEY_APP_PREF_STRING_DETECTION_MODEL, "YOLO_V4_TINY"));
+        Detector.MODEL selectedModel = Detector.MODEL.valueOf(sharedPref.getString(SettingsActivity.KEY_APP_PREF_STRING_DETECTION_MODEL, "YOLO_V4_TINY_1"));
         DETECTOR.setSelectedModel(selectedModel);
 
         // Model parameters
@@ -200,11 +200,11 @@ public class MainActivity extends AppCompatActivity {
 
         speedometer = (TubeSpeedometer) findViewById(R.id.speedView);
         speedometer.setMaxSpeed(200f);
-        recyclerView = findViewById(R.id.rv_detections);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new RecyclerViewAdapter(detectedSignsStack, this);
-        recyclerView.setAdapter(adapter);
-        recyclerView.hasFixedSize();
+//        recyclerView = findViewById(R.id.rv_detections);
+//        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+//        adapter = new RecyclerViewAdapter(detectedSignsStack, this);
+//        recyclerView.setAdapter(adapter);
+//        recyclerView.hasFixedSize();
 
         if (modelMetricsShow.get()) {
             tvInfo.setVisibility(View.VISIBLE);
@@ -310,7 +310,7 @@ public class MainActivity extends AppCompatActivity {
                         label[0] = box.getLabel();
 
                         // Perform OCR for speed limit detections
-                        if ("speed limit".equals(box.getLabel())) {
+                        if ("speed_limit".equals(box.getLabel())) {
                             RectF rect = box.getRect();
 
                             Log.i("DETECTION", "LABEL: [" + box.getLabel() + "]");
@@ -425,10 +425,10 @@ public class MainActivity extends AppCompatActivity {
                         speedLimit = Float.parseFloat(newDetection.getSpeed().replaceAll("[^0-9]", ""));
                     }
                     // signs
-                    adapter.notifyDataSetChanged();
-                    if (!detectedSignsStack.empty()) {
-                        recyclerView.scrollToPosition(detectedSignsStack.size() - 1);
-                    }
+//                    adapter.notifyDataSetChanged();
+//                    if (!detectedSignsStack.empty()) {
+//                        recyclerView.scrollToPosition(detectedSignsStack.size() - 1);
+//                    }
                 });
             }, "detect");
             detectThread.start();

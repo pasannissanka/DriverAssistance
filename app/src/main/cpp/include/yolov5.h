@@ -77,6 +77,12 @@ public:
 
     std::vector<BoxInfo> detect(JNIEnv *env, jobject image, float threshold, float nms_threshold);
 
+    std::vector<YoloLayerData> layers{
+            {"394",    32, {{116, 90}, {156, 198}, {373, 326}}},
+            {"375",    16, {{30,  61}, {62,  45},  {59,  119}}},
+            {"output", 8,  {{10,  13}, {16,  30},  {33,  23}}},
+    };
+
     std::vector<std::string> labels{
             "T_juc_ahead",
             "bend_ahead",
@@ -117,18 +123,15 @@ public:
 private:
     ncnn::Net *Net;
 
-    const int target_size = 640;
+    int input_size = 640;
+    int num_class = 80;
 
-    static inline float sigmoid(float x);
-    static void generate_proposals(const ncnn::Mat& anchors, int stride, const ncnn::Mat& in_pad, const ncnn::Mat& feat_blob, float prob_threshold, std::vector<BoxInfo>& objects);
-    static void qsort_descent_inplace(std::vector<BoxInfo>& faceobjects, int left, int right);
-    static void qsort_descent_inplace(std::vector<BoxInfo>& faceobjects);
-    static inline float intersection_area(const BoxInfo & a, const BoxInfo & b);
-    static void nms_sorted_bboxes(const std::vector<BoxInfo>& faceobjects, std::vector<int>& picked, float nms_threshold, bool agnostic = false);
-
+    std::vector<BoxInfo>decode_infer(ncnn::Mat &data, int stride, const yolo::Size &frame_size, int net_size, int num_classes, const std::vector<yolo::Size> &anchors, float threshold);
+    void nms(std::vector<BoxInfo> &input_boxes, float NMS_THRESH);
 
 public:
     static yolov5 *yolov5_detector;
+    static bool yolov5_hasGPU;
 };
 
 #endif //YOLOV5_H

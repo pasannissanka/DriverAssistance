@@ -9,8 +9,23 @@ public class Box {
     private final float score;
     private final int id;
 
+    private static final String[] labels_v_1 = {
+            "bus prority lane",
+            "children crossing",
+            "hospital",
+            "level crossing with gate",
+            "no honking",
+            "no left turn",
+            "no right turn",
+            "no u turn",
+            "other",
+            "pedestrian crossing",
+            "pedestrian crossing ahead",
+            "speed_limit",
+    };
+
     // Labels to Detect
-    private static final String[] labels = {
+    private static final String[] labels_v_2 = {
             "T_juc_ahead",
             "bend_ahead",
             "bus_only_lane",
@@ -48,6 +63,7 @@ public class Box {
             "turn",
     };
 
+
     public Box(float x0, float y0, float x1, float y1, int label, float score, int id) {
         this.x0 = x0;
         this.y0 = y0;
@@ -63,7 +79,12 @@ public class Box {
     }
 
     public String getLabel() {
-        return labels[label];
+        Detector.MODEL selectedModel = Detector.getInstance().getSelectedModel();
+        if (selectedModel== Detector.MODEL.YOLO_V4_TINY_1) {
+            return labels_v_1[label];
+        } else {
+            return labels_v_2[label];
+        }
     }
 
     public int getLabelId() {
