@@ -26,4 +26,8 @@
     <string name="threshold">Threshold</string>
     <string name="nms_threshold">NMS threshold</string>
     <string name="k_min_hits">Min hits</string>
+    <string name="kmph">Kmph</string>
+    <string name="you_re_going_too_fast">You\'re going too fast!</string>
+    <string name="_50">50</string>
+    <string name="speed_limit">Speed Limit</string>
 </resources>
