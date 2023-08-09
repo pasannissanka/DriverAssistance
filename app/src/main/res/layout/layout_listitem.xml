@@ -11,6 +11,7 @@
         android:id="@+id/iv_signs"
         android:layout_width="70dp"
         android:layout_height="70dp"
-        app:srcCompat="@drawable/ic_speed_circle" />
+        app:srcCompat="@drawable/ic_speed_circle"
+        android:contentDescription="@string/sign" />
 
 </RelativeLayout>

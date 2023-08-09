@@ -162,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
             builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    Toast.makeText(mainActivity, "Please enable Location-based service / GPS", Toast.LENGTH_LONG).show();
+                    Toast.makeText(mainActivity, R.string.enable_location, Toast.LENGTH_LONG).show();
                 }
             });
             builder.create().show();
@@ -186,7 +186,6 @@ public class MainActivity extends AppCompatActivity {
         nms_threshold = Double.parseDouble(sharedPref.getString(SettingsActivity.KEY_MODEL_PREF_DOUBLE_NMS_THRESHOLD, "0.7"));
         kMinHits = Integer.parseInt(sharedPref.getString(SettingsActivity.KEY_MODEL_PREF_DOUBLE_K_MIN_HITS, "3"));
 
-//        YOLOv4.init(getAssets(), "", "");
         DETECTOR.init(getAssets());
 
         resultImageView = findViewById(R.id.imageView);
@@ -200,11 +199,11 @@ public class MainActivity extends AppCompatActivity {
 
         speedometer = (TubeSpeedometer) findViewById(R.id.speedView);
         speedometer.setMaxSpeed(200f);
-//        recyclerView = findViewById(R.id.rv_detections);
-//        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-//        adapter = new RecyclerViewAdapter(detectedSignsStack, this);
-//        recyclerView.setAdapter(adapter);
-//        recyclerView.hasFixedSize();
+        recyclerView = findViewById(R.id.rv_detections);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new RecyclerViewAdapter(detectedSignsStack, this);
+        recyclerView.setAdapter(adapter);
+        recyclerView.hasFixedSize();
 
         if (modelMetricsShow.get()) {
             tvInfo.setVisibility(View.VISIBLE);
@@ -231,7 +230,6 @@ public class MainActivity extends AppCompatActivity {
         exitBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                startActivity(new Intent(MainActivity.this, PopUp.class));
                 System.exit(0);
             }
         });
@@ -297,7 +295,6 @@ public class MainActivity extends AppCompatActivity {
                 Bitmap bitmap = Bitmap.createBitmap(bitmapSrc, 0, 0, width, height, matrix, false);
 
                 startTime = System.currentTimeMillis();
-//                Box[] result = YOLOv4.detect(bitmap, threshold, nms_threshold, kMinHits);
                 Box[] result = DETECTOR.detect(bitmap, threshold, nms_threshold, kMinHits);
                 endTime = System.currentTimeMillis();
 
@@ -425,10 +422,10 @@ public class MainActivity extends AppCompatActivity {
                         speedLimit = Float.parseFloat(newDetection.getSpeed().replaceAll("[^0-9]", ""));
                     }
                     // signs
-//                    adapter.notifyDataSetChanged();
-//                    if (!detectedSignsStack.empty()) {
-//                        recyclerView.scrollToPosition(detectedSignsStack.size() - 1);
-//                    }
+                    adapter.notifyDataSetChanged();
+                    if (!detectedSignsStack.empty()) {
+                        recyclerView.scrollToPosition(detectedSignsStack.size() - 1);
+                    }
                 });
             }, "detect");
             detectThread.start();
@@ -485,7 +482,6 @@ public class MainActivity extends AppCompatActivity {
         detectPhoto.set(true);
         Bitmap image = getPicture(data.getData());
         startTime = System.currentTimeMillis();
-//        Box[] result = YOLOv4.detect(image, threshold, nms_threshold, kMinHits);
         Box[] result = DETECTOR.detect(image, threshold, nms_threshold, kMinHits);
         endTime = System.currentTimeMillis();
 
@@ -630,7 +626,6 @@ public class MainActivity extends AppCompatActivity {
 
                     if (filtSpeed > speedLimit && speedLimit != 0.0f && !highSpeed) {
                         highSpeed = true;
-//                        Toast.makeText(context, "Over speed limit", Toast.LENGTH_LONG).show();
                         Intent popUpIntent = new Intent(MainActivity.this, PopUp.class);
                         popUpIntent.putExtra("speed", speedLimit);
                         startActivityIfNeeded(popUpIntent, 1);

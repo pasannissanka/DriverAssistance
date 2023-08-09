@@ -36,41 +36,41 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     };
 //    TODO
     private static final int[] labelIds_v2 = {
-            R.drawable.ic_bus_line,  // T_juc_ahead
-            R.drawable.ic_child_cross,  // bend_ahead
+            R.drawable.ic_t_junct_ahead,  // T_juc_ahead
+            R.drawable.ic_bend_ahead,  // bend_ahead
             R.drawable.ic_bus_line,  // bus_only_lane
-            R.drawable.ic_rail_cross,  // bus_stop
-            R.drawable.ic_no_honk,  // chevron_markers
+            R.drawable.ic_bus_stop,  // bus_stop
+            R.drawable.ic_chevron,  // chevron_markers
             R.drawable.ic_child_cross,  // children_crossing_ahead
-            R.drawable.ic_no_right,  // directional_express_way
-            R.drawable.ic_no_u_turn,  // directional_normal
-            R.drawable.ic_speed_circle,  // expressway
-            R.drawable.ic_pedestrian_cross,  // give_way
-            R.drawable.ic_ped_cross_ahead,  // height_limit
+            R.drawable.ic_speed_circle,  // directional_express_way
+            R.drawable.ic_speed_circle,  // directional_normal
+            R.drawable.ic_expressway,  // expressway
+            R.drawable.ic_giveway,  // give_way
+            R.drawable.ic_height_limit,  // height_limit
             R.drawable.ic_hospital,  // hospital
-            R.drawable.ic_bus_line,  // level_crossing
-            R.drawable.ic_child_cross,  // level_crossing_gates_ahead
-            R.drawable.ic_hospital,  // light_signal_ahead
-            R.drawable.ic_rail_cross,  // merge_ahead
-            R.drawable.ic_no_honk,  // no_entry
+            R.drawable.ic_level_crossing,  // level_crossing
+            R.drawable.ic_level_crossing_with_gates,  // level_crossing_gates_ahead
+            R.drawable.ic_light_signal,  // light_signal_ahead
+            R.drawable.ic_merge_ahead,  // merge_ahead
+            R.drawable.ic_no_entry,  // no_entry
             R.drawable.ic_no_honk,  // no_horning
-            R.drawable.ic_no_right,  // no_parking
+            R.drawable.ic_no_parking,  // no_parking
             R.drawable.ic_no_left,  // no_turn
             R.drawable.ic_no_u_turn,  // no_u_turn
-            R.drawable.ic_pedestrian_cross,  // one_way
-            R.drawable.ic_ped_cross_ahead,  // parking
-            R.drawable.ic_speed_circle,  // pass
+            R.drawable.ic_one_way,  // one_way
+            R.drawable.ic_parking,  // parking
+            R.drawable.ic_pass,  // pass
             R.drawable.ic_pedestrian_cross,  // pedestrian_crossing
             R.drawable.ic_ped_cross_ahead,  // pedestrian_crossing_ahead
             R.drawable.ic_speed_circle,  // road_closed
-            R.drawable.ic_no_left,  // road_narrows_ahead
-            R.drawable.ic_no_right,  // road_works_ahead
-            R.drawable.ic_no_u_turn,  // roundabout
-            R.drawable.ic_speed_circle,  // roundabout_ahead
-            R.drawable.ic_pedestrian_cross,  // side_road
+            R.drawable.ic_road_narrows,  // road_narrows_ahead
+            R.drawable.ic_road_works,  // road_works_ahead
+            R.drawable.ic_roundabout,  // roundabout
+            R.drawable.ic_roundabout_ahead,  // roundabout_ahead
+            R.drawable.ic_side_road,  // side_road
             R.drawable.ic_speed_circle,  // speed_limit
-            R.drawable.ic_speed_circle,  // stop
-            R.drawable.ic_speed_circle,  // turn
+            R.drawable.ic_stop,  // stop
+            R.drawable.ic_turn,  // turn
     };
 
     private final Stack<Detection> detections;
