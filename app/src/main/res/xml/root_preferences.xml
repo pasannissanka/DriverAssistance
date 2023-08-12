@@ -38,7 +38,8 @@
     <PreferenceCategory app:title="@string/model_header">
 
         <EditTextPreference
-            android:defaultValue="0.35"
+            android:defaultValue="0.5"
+            android:imeOptions="flagNoFullscreen"
             android:inputType="numberDecimal"
             app:key="etp_threshold"
             app:title="@string/threshold"
@@ -46,6 +47,7 @@
 
         <EditTextPreference
             android:defaultValue="0.7"
+            android:imeOptions="flagNoFullscreen"
             android:inputType="numberDecimal"
             app:key="etp_nms_threshold"
             app:title="@string/nms_threshold"
@@ -53,6 +55,7 @@
 
         <EditTextPreference
             android:defaultValue="2"
+            android:imeOptions="flagNoFullscreen"
             android:inputType="number"
             app:key="etp_k_min_hits"
             app:title="@string/k_min_hits"

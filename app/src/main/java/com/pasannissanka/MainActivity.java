@@ -62,6 +62,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -84,11 +85,7 @@ public class MainActivity extends AppCompatActivity {
     private MainActivity mainActivity;
 
     private static final int REQUEST_PICK_IMAGE = 2;
-    private static final String[] PERMISSIONS = {
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.CAMERA,
-            Manifest.permission.ACCESS_FINE_LOCATION
-    };
+    private static final String[] PERMISSIONS = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA, Manifest.permission.ACCESS_FINE_LOCATION};
     private ImageView resultImageView;
     private TextView tvInfo;
     private TubeSpeedometer speedometer;
@@ -127,9 +124,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         hideSystemBars();
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(
-                WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         Objects.requireNonNull(getSupportActionBar()).hide();
@@ -137,8 +132,7 @@ public class MainActivity extends AppCompatActivity {
         mainActivity = this;
 
         ActivityCompat.requestPermissions(this, PERMISSIONS, PackageManager.PERMISSION_GRANTED);
-        while ((ContextCompat.checkSelfPermission(this.getApplicationContext(), PERMISSIONS[0]) == PackageManager.PERMISSION_DENIED
-                || ContextCompat.checkSelfPermission(this.getApplicationContext(), PERMISSIONS[1]) == PackageManager.PERMISSION_DENIED)) {
+        while ((ContextCompat.checkSelfPermission(this.getApplicationContext(), PERMISSIONS[0]) == PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(this.getApplicationContext(), PERMISSIONS[1]) == PackageManager.PERMISSION_DENIED)) {
             try {
                 wait(1000);
             } catch (InterruptedException e) {
@@ -253,9 +247,7 @@ public class MainActivity extends AppCompatActivity {
     private void startCamera() {
         CameraX.unbindAll();
 
-        PreviewConfig previewConfig = new PreviewConfig.Builder()
-                .setLensFacing(CameraX.LensFacing.BACK)
-                .setTargetResolution(new Size(416, 416))  // Resolution
+        PreviewConfig previewConfig = new PreviewConfig.Builder().setLensFacing(CameraX.LensFacing.BACK).setTargetResolution(new Size(416, 416))  // Resolution
                 .build();
 
         Preview preview = new Preview(previewConfig);
@@ -286,8 +278,7 @@ public class MainActivity extends AppCompatActivity {
             final Bitmap bitmapSrc = imageToBitmap(image);  // Format Conversion
 
             // Detection Thread
-            @SuppressLint("NotifyDataSetChanged")
-            Thread detectThread = new Thread(() -> {
+            @SuppressLint("NotifyDataSetChanged") Thread detectThread = new Thread(() -> {
                 Matrix matrix = new Matrix();
                 matrix.postRotate(rotationDegrees);
                 width = bitmapSrc.getWidth();
@@ -306,6 +297,8 @@ public class MainActivity extends AppCompatActivity {
                         final String[] label = {""};
                         label[0] = box.getLabel();
 
+                        String[] disabledLabels = {"directional_express_way", "directional_normal"};
+
                         // Perform OCR for speed limit detections
                         if ("speed_limit".equals(box.getLabel())) {
                             RectF rect = box.getRect();
@@ -314,49 +307,44 @@ public class MainActivity extends AppCompatActivity {
 
                             // Crop speed limit Bounding box
                             assert (rect.left < rect.right && rect.top < rect.bottom);
-                            Bitmap croppedBmp = Bitmap.createBitmap(mutableBitmap,
-                                    (int) rect.left, (int) rect.top,
-                                    (int) rect.width(), (int) rect.height());
-                            Bitmap scaledBmp = Bitmap.createScaledBitmap(croppedBmp,
-                                    600, 600, true);
+                            Bitmap croppedBmp = Bitmap.createBitmap(mutableBitmap, (int) rect.left, (int) rect.top, (int) rect.width(), (int) rect.height());
+                            Bitmap scaledBmp = Bitmap.createScaledBitmap(croppedBmp, 600, 600, true);
                             InputImage ocrImg = InputImage.fromBitmap(scaledBmp, 0);
 
                             // Do OCR
-                            Task<Text> recognizerResult = recognizer.process(ocrImg)
-                                    .addOnSuccessListener(visionText -> {
-                                        // Task completed successfully
-                                        String resultText = processTextRecognitionResult(visionText);
-                                        label[0] = resultText;
-                                        if (!resultText.replaceAll("[^0-9]", "").isEmpty()) {
-                                            int speed = Integer.parseInt(resultText.replaceAll("[^0-9]", ""));
+                            Task<Text> recognizerResult = recognizer.process(ocrImg).addOnSuccessListener(visionText -> {
+                                // Task completed successfully
+                                String resultText = processTextRecognitionResult(visionText);
+                                label[0] = resultText;
+                                if (!resultText.replaceAll("[^0-9]", "").isEmpty()) {
+                                    int speed = Integer.parseInt(resultText.replaceAll("[^0-9]", ""));
 
-                                            Log.i("OCR", "RESULT: [" + resultText + "] , SPEED: [" + speed + "]");
+                                    Log.i("OCR", "RESULT: [" + resultText + "] , SPEED: [" + speed + "]");
 
-                                            if (detectedSpeedLimits.containsKey(speed)) {
-                                                Detection det = detectedSpeedLimits.get(speed);
-                                                assert det != null;
-                                                String lastText = det.getSpeed().replaceAll("[^0-9]", "");
-                                                det.setSpeed(resultText);
-                                                detectedSpeedLimits.replace(speed, det);
-                                                if (!lastText.equals(resultText.replaceAll("[^0-9]", ""))) {
-                                                    detectedSpeedLimitsStack.push(det);
-                                                }
-                                            } else {
-                                                Detection det = new Detection(box.getLabelId());
-                                                det.setSpeed(resultText);
-                                                detectedSpeedLimits.put(speed, det);
-                                                detectedSpeedLimitsStack.push(det);
-                                            }
-
+                                    if (detectedSpeedLimits.containsKey(speed)) {
+                                        Detection det = detectedSpeedLimits.get(speed);
+                                        assert det != null;
+                                        String lastText = det.getSpeed().replaceAll("[^0-9]", "");
+                                        det.setSpeed(resultText);
+                                        detectedSpeedLimits.replace(speed, det);
+                                        if (!lastText.equals(resultText.replaceAll("[^0-9]", ""))) {
+                                            detectedSpeedLimitsStack.push(det);
                                         }
-                                    })
-                                    .addOnFailureListener(e -> {
-                                        // Task failed with an exception
-                                        Log.e(LOG, "OCR" + e.toString());
-                                    });
+                                    } else {
+                                        Detection det = new Detection(box.getLabelId());
+                                        det.setSpeed(resultText);
+                                        detectedSpeedLimits.put(speed, det);
+                                        detectedSpeedLimitsStack.push(det);
+                                    }
+
+                                }
+                            }).addOnFailureListener(e -> {
+                                // Task failed with an exception
+                                Log.e(LOG, "OCR" + e.toString());
+                            });
                             // Wait for OCR to finish
                             Tasks.await(recognizerResult);
-                        } else {
+                        } else if (Arrays.stream(disabledLabels).noneMatch(s -> s.equals(box.getLabel()))) {
                             Detection det = new Detection(box.getLabelId());
 
                             Log.i("DETECTION", "LABEL: [" + det.getLabel() + "]");
@@ -387,9 +375,7 @@ public class MainActivity extends AppCompatActivity {
                             boxPaint.setStyle(Paint.Style.FILL);
 
                             // Set Bounding Boxes and Labels
-                            canvas.drawText(label[0] + " [" + score + "%]",
-                                    box.x0 - strokeWidth, box.y0 - strokeWidth
-                                    , boxPaint);
+                            canvas.drawText(label[0] + " [" + score + "%]", box.x0 - strokeWidth, box.y0 - strokeWidth, boxPaint);
 //                            canvas.drawText("id: ", box.x1 - strokeWidth, box.y1 - strokeWidth, boxPaint);
                             boxPaint.setStyle(Paint.Style.STROKE);
                             canvas.drawRect(box.getRect(), boxPaint);
@@ -411,9 +397,7 @@ public class MainActivity extends AppCompatActivity {
                     if (modelMetricsShow.get()) {
                         long dur = endTime - startTime;
                         float fps = (float) (1000.0 / dur);
-                        tvInfo.setText(String.format(Locale.ENGLISH,
-                                "ImgSize: %dx%d\nUseTime: %d ms\nDetectFPS: %.2f",
-                                height, width, dur, fps));
+                        tvInfo.setText(String.format(Locale.ENGLISH, "ImgSize: %dx%d\nUseTime: %d ms\nDetectFPS: %.2f", height, width, dur, fps));
                     }
                     // speed limit
                     if (!detectedSpeedLimitsStack.empty()) {
@@ -503,9 +487,7 @@ public class MainActivity extends AppCompatActivity {
 
             boxPaint.setColor(box.getColor());
             boxPaint.setStyle(Paint.Style.FILL);
-            canvas.drawText(box.getLabel() + " [" + score + "%]",
-                    box.x0 - strokeWidth, box.y0 - strokeWidth
-                    , boxPaint);
+            canvas.drawText(box.getLabel() + " [" + score + "%]", box.x0 - strokeWidth, box.y0 - strokeWidth, boxPaint);
             boxPaint.setStyle(Paint.Style.STROKE);
             canvas.drawRect(box.getRect(), boxPaint);
         }
@@ -516,9 +498,7 @@ public class MainActivity extends AppCompatActivity {
         resultImageView.setImageBitmap(mutableBitmap);
         detecting.set(false);
         long dur = endTime - startTime;
-        tvInfo.setText(String.format(Locale.CHINESE,
-                "ImgSize: %dx%d\nUseTime: %d ms\nAvgMatchScore: %d%%",
-                height, width, dur, scoreAvg));
+        tvInfo.setText(String.format(Locale.CHINESE, "ImgSize: %dx%d\nUseTime: %d ms\nAvgMatchScore: %d%%", height, width, dur, scoreAvg));
 
     }
 
@@ -581,15 +561,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void hideSystemBars() {
-        WindowInsetsControllerCompat windowInsetsController =
-                ViewCompat.getWindowInsetsController(getWindow().getDecorView());
+        WindowInsetsControllerCompat windowInsetsController = ViewCompat.getWindowInsetsController(getWindow().getDecorView());
         if (windowInsetsController == null) {
             return;
         }
         // Configure the behavior of the hidden system bars
-        windowInsetsController.setSystemBarsBehavior(
-                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        );
+        windowInsetsController.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
         // Hide both the status bar and the navigation bar
         windowInsetsController.hide(WindowInsetsCompat.Type.systemBars());
     }
@@ -648,8 +625,7 @@ public class MainActivity extends AppCompatActivity {
                 public void onProviderDisabled(String s) {
                 }
             };
-            if (ActivityCompat.checkSelfPermission(mainActivity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                    && ActivityCompat.checkSelfPermission(mainActivity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(mainActivity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mainActivity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 return;
             }
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, listener);
@@ -664,19 +640,16 @@ public class MainActivity extends AppCompatActivity {
          */
         private float filter(final float prev, final float curr, final int ratio) {
             // If first time through, initialise digital filter with current values
-            if (Float.isNaN(prev))
-                return curr;
+            if (Float.isNaN(prev)) return curr;
             // If current value is invalid, return previous filtered value
-            if (Float.isNaN(curr))
-                return prev;
+            if (Float.isNaN(curr)) return prev;
             // Calculate new filtered value
             return (float) (curr / ratio + prev * (1.0 - 1.0 / ratio));
         }
     }
 
     private boolean isLocationEnabled(Context mContext) {
-        LocationManager locationManager = (LocationManager)
-                mContext.getSystemService(Context.LOCATION_SERVICE);
+        LocationManager locationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
     }
 }

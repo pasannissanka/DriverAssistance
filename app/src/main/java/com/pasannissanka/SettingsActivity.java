@@ -62,7 +62,7 @@ public class SettingsActivity extends AppCompatActivity {
                         new EditTextPreference.OnBindEditTextListener() {
                             @Override
                             public void onBindEditText(@NonNull EditText editText) {
-                                editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+                                editText.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
                             }
                         }
                 );
