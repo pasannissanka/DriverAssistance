@@ -16,7 +16,7 @@ endif()
 
 aux_source_directory(. SRC_LIST)
 add_library(
-        yolov4
+        detector
         SHARED
         ${SRC_LIST}
 )
@@ -74,7 +74,8 @@ set_target_properties(
 # enable rtti and exceptions
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -frtti")
 target_link_libraries( # Specifies the target library.
-        yolov4
+#        yolov4
+        detector
 
         # Links the target library to the log library
         # included in the NDK.
@@ -93,7 +94,8 @@ target_link_libraries( # Specifies the target library.
 # build script, prebuilt third-party libraries, or system libraries.
 
 target_link_libraries( # Specifies the target library.
-        yolov4
+#        yolov4
+        detector
 
         # Links the target library to the log library
         # included in the NDK.

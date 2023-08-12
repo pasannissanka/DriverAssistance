@@ -17,4 +17,14 @@
         <item>70</item>
         <item>100</item>
     </string-array>
+
+    <string-array name="detection_model_entries">
+        <item>YOLOv4 tiny 1</item>
+        <item>YOLOv4 tiny 2</item>
+    </string-array>
+
+    <string-array name="detection_model_values">
+        <item>YOLO_V4_TINY_1</item>
+        <item>YOLO_V4_TINY_2</item>
+    </string-array>
 </resources>

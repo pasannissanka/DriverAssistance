@@ -4,7 +4,7 @@
 #include <android/asset_manager_jni.h>
 #include <android/log.h>
 #include "include/yolov4.h"
-#include "include/tracker.h"
+#include "include/yolov5.h"
 
 JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     ncnn::create_gpu_instance();
@@ -19,70 +19,85 @@ JNIEXPORT void JNI_OnUnload(JavaVM *vm, void *reserved) {
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_example_YOLOv4_init(JNIEnv *env, jclass, jobject assetManager) {
+Java_com_pasannissanka_YOLOv4_init(JNIEnv *env, jclass, jobject assetManager, jstring param, jstring bin) {
     if (yolov4::detector == nullptr) {
         AAssetManager *mgr = AAssetManager_fromJava(env, assetManager);
-        yolov4::detector = new yolov4(mgr, "custom-yolov4-tiny-detector_opt.param",
-                                      "custom-yolov4-tiny-detector_opt.bin", false);
-    }
-    if (Tracker::sort == nullptr) {
-        Tracker::sort = new Tracker();
+        const char *model_param = env->GetStringUTFChars(param, nullptr);
+        const char *model_bin = env->GetStringUTFChars(bin, nullptr);
+        yolov4::detector = new yolov4(mgr, model_param,model_bin, false);
     }
 }
 
 extern "C" JNIEXPORT jobjectArray JNICALL
-Java_com_example_YOLOv4_detect(JNIEnv *env, jclass, jobject image, jdouble threshold,
+Java_com_pasannissanka_YOLOv4_detect(JNIEnv *env, jclass, jobject image, jdouble threshold,
                                jdouble nms_threshold, jint k_min_hits) {
 
     auto result = yolov4::detector->detect(env, image, threshold, nms_threshold);
 
-    Tracker::sort->Run(result);
-    auto tracks = Tracker::sort->GetTracks();
-
-    auto box_cls = env->FindClass("com/example/Box");
+    auto box_cls = env->FindClass("com/pasannissanka/Box");
     auto cid = env->GetMethodID(box_cls, "<init>", "(FFFFIFI)V");
     jobjectArray ret = env->NewObjectArray(result.size(), box_cls, nullptr);
     int i = 0;
 
-//    for (auto &trk: tracks) {
-//        if (trk.second.coast_cycles_ < kMaxCoastCycles && (trk.second.hit_streak_ >= kMinHits)) {
-//            const auto &bbox = trk.second.GetStateAsBbox();
-//            env->PushLocalFrame(1);
-//            jobject obj = env->NewObject(
-//                    box_cls,
-//                    cid,
-//                    (float) bbox.x,                // x0
-//                    (float) bbox.y,                // y0
-//                    (float) bbox.width + bbox.x,   // x1
-//                    (float) bbox.height + bbox.y,  // y1
-//                    trk.second.label,              // label
-//                    (float) trk.second.score,      // score
-//                    trk.first                      // id
-//            );
-//            obj = env->PopLocalFrame(obj);
-//            env->SetObjectArrayElement(ret, i++, obj);
-//        }
-//    }
-
-    for (auto &trk: tracks) {
-        if (trk.second.coast_cycles_ < kMaxCoastCycles && (trk.second.hit_streak_ >= k_min_hits)) {
-            const auto &bbox = trk.second.GetStateAsBbox();
-            env->PushLocalFrame(1);
-            jobject obj = env->NewObject(
-                    box_cls,
-                    cid,
-                    (float) bbox.x,                // x0
-                    (float) bbox.y,                // y0
-                    (float) bbox.width + bbox.x,   // x1
-                    (float) bbox.height + bbox.y,  // y1
-                    trk.second.label,              // label
-                    (float) trk.second.score,      // score
-                    trk.first                      // id
-            );
-            obj = env->PopLocalFrame(obj);
-            env->SetObjectArrayElement(ret, i++, obj);
-        }
-
+    for (auto &res: result) {
+        const auto &bbox = res.box;
+        env->PushLocalFrame(1);
+        jobject obj = env->NewObject(
+                box_cls,
+                cid,
+                (float) bbox.x,                // x0
+                (float) bbox.y,                // y0
+                (float) bbox.width + bbox.x,   // x1
+                (float) bbox.height + bbox.y,  // y1
+                res.label,              // label
+                (float) res.score,      // score
+                res.id                      // id
+        );
+        obj = env->PopLocalFrame(obj);
+        env->SetObjectArrayElement(ret, i++, obj);
     }
+
+    return ret;
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_pasannissanka_YOLOv5_init(JNIEnv *env, jclass clazz, jobject assetManager, jstring param, jstring bin) {
+    // TODO: implement init()
+    if (yolov5::yolov5_detector == nullptr) {
+        AAssetManager *mgr = AAssetManager_fromJava(env, assetManager);
+        const char *model_param = env->GetStringUTFChars(param, nullptr);
+        const char *model_bin = env->GetStringUTFChars(bin, nullptr);
+        yolov5::yolov5_detector = new yolov5(mgr, model_param,model_bin, false);
+    }
+}
+extern "C"
+JNIEXPORT jobjectArray JNICALL
+Java_com_pasannissanka_YOLOv5_detect(JNIEnv *env, jclass, jobject image, jdouble threshold,
+                               jdouble nms_threshold, jint k_min_hits) {
+    auto result = yolov5::yolov5_detector->detect(env, image, threshold, nms_threshold);
+
+    auto box_cls = env->FindClass("com/pasannissanka/Box");
+    auto cid = env->GetMethodID(box_cls, "<init>", "(FFFFIFI)V");
+    jobjectArray ret = env->NewObjectArray(result.size(), box_cls, nullptr);
+    int i = 0;
+
+    for (auto &res: result) {
+        const auto &bbox = res.box;
+        env->PushLocalFrame(1);
+        jobject obj = env->NewObject(
+                box_cls,
+                cid,
+                (float) bbox.x,                // x0
+                (float) bbox.y,                // y0
+                (float) bbox.width + bbox.x,   // x1
+                (float) bbox.height + bbox.y,  // y1
+                res.label,              // label
+                (float) res.score,      // score
+                res.id                      // id
+        );
+        obj = env->PopLocalFrame(obj);
+        env->SetObjectArrayElement(ret, i++, obj);
+    }
+
     return ret;
 }
